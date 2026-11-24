@@ -38,6 +38,8 @@ This is application-level confirmation that the candidate gets past the observed
 
 Stop only this project container when finished:
 
+Subsequent manual login attempts reached missing `Operations` and `Customview` objects. The fixture now supplies both: an activity log inferred from the executable/Utility INSERT lists and an empty view-settings table accepted by Monitor's recovered no-row path. The local SQL checks exercise the settings query and both activity INSERT column contracts, rolling back all test events. Both copies have been reopened; fresh application acceptance is pending. These additions do not yet supply application/process/batch/document definitions.
+
 ```powershell
 docker compose --env-file .local/fixture.env stop
 ```

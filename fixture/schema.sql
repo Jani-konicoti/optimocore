@@ -55,3 +55,52 @@ CREATE TABLE dbo.UsersUsersProfilesMatch (
     CONSTRAINT PK_CoreReaUserProfile PRIMARY KEY(IDUser, IDProfile)
 );
 GO
+-- frmMainMonitor.RecuperaStringaricerca accepts no matching rows and returns
+-- empty settings. Leave this table empty to preserve that built-in path.
+IF OBJECT_ID(N'dbo.Customview', N'U') IS NULL
+CREATE TABLE dbo.Customview (
+    IDArea int NOT NULL PRIMARY KEY,
+    MONITOR_BATCH_VIEW_QUERY nvarchar(max) NOT NULL DEFAULT N'',
+    MONITOR_STATUS_FILTER_QUERY nvarchar(max) NOT NULL DEFAULT N''
+);
+-- Inferred from Utility.LogInOperationDB and both main forms' INSERT lists.
+-- IDBatch is text because session events explicitly insert an empty string.
+-- No workflow foreign keys: login/session events use zero IDs.
+IF OBJECT_ID(N'dbo.Operations', N'U') IS NULL
+CREATE TABLE dbo.Operations (
+    IDOperation bigint IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    IDApplication int NOT NULL DEFAULT 0,
+    IDBatch nvarchar(255) NOT NULL DEFAULT N'',
+    IDProcess int NOT NULL DEFAULT 0,
+    IDUser int NOT NULL DEFAULT 0,
+    IDClient int NOT NULL DEFAULT 0,
+    IDUserProfile int NOT NULL DEFAULT 0,
+    ApplicationName nvarchar(255) NOT NULL DEFAULT N'',
+    BatchName nvarchar(255) NOT NULL DEFAULT N'',
+    ProcessName nvarchar(255) NOT NULL DEFAULT N'',
+    StationName nvarchar(255) NOT NULL DEFAULT N'',
+    Activity nvarchar(255) NOT NULL DEFAULT N'',
+    Status nvarchar(255) NOT NULL DEFAULT N'',
+    UserName nvarchar(255) NOT NULL DEFAULT N'',
+    BoxName nvarchar(255) NOT NULL DEFAULT N'',
+    Notes nvarchar(max) NOT NULL DEFAULT N'',
+    TimeStampOp datetime NOT NULL DEFAULT GETDATE(),
+    StartTime datetime NULL,
+    EndTime datetime NULL,
+    Duration int NOT NULL DEFAULT 0,
+    Boxes int NOT NULL DEFAULT 0,
+    Images int NOT NULL DEFAULT 0,
+    Files int NOT NULL DEFAULT 0,
+    Docs int NOT NULL DEFAULT 0,
+    ImagesOCR int NOT NULL DEFAULT 0,
+    FilesOCR int NOT NULL DEFAULT 0,
+    DocsOCR int NOT NULL DEFAULT 0,
+    ImagesDV int NOT NULL DEFAULT 0,
+    FilesDV int NOT NULL DEFAULT 0,
+    DocsDV int NOT NULL DEFAULT 0,
+    FieldsDV int NOT NULL DEFAULT 0,
+    RecordsDV int NOT NULL DEFAULT 0,
+    CharsDV int NOT NULL DEFAULT 0,
+    TotalKeysDV int NOT NULL DEFAULT 0
+);
+GO

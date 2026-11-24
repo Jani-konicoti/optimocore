@@ -38,6 +38,12 @@ Useful next steps:
 
 ## How the three coworkers continue
 
+### Latest local database repair
+
+The user's subsequent manual attempts reached missing-object errors for `Operations` (DataValidation) and `Customview` (Monitor). Added both inferred tables from the recovered queries. Customview remains empty: Monitor's RecuperaStringaricerca explicitly accepts no matching rows and returns empty settings. Operations includes the column lists used by both main forms and Utility.LogInOperationDB; session events allow an empty batch ID and zero object IDs. These types are compatibility inferences, not a recovered vendor schema.
+
+Applied the initializer locally and verified both active-profile queries, the Monitor settings query, and representative activity inserts covering both column lists. Test inserts run in a rolled-back transaction. Both candidate applications were restarted for manual login. The current fixture has seven tables; Applications, Process, Batches and Fields remain missing. The repaired SQL contracts pass; a fresh application login and document workflows remain unverified. The personal testing guide remains local and ignored.
+
 Each coworker uses their own account and local clone. Share the original archive privately; ignored `.local` artifacts do not travel through Git. Run README reproduction steps, then inspect this handoff and the findings before repeating any investigation.
 
 Suggested continuation prompt:

@@ -17,6 +17,24 @@ try {
     $null = $command.Parameters.AddWithValue('@password', $credentials.app_password)
     if ([int]$command.ExecuteScalar() -ne 1) { throw 'Synthetic credential query failed' }
     $command.Dispose()
+    # Exercise the recovered column contracts without retaining fabricated events.
+    $transaction = $connection.BeginTransaction()
+    try {
+        $command = $connection.CreateCommand()
+        $command.Transaction = $transaction
+        $command.CommandText = @'
+SELECT MONITOR_BATCH_VIEW_QUERY, MONITOR_STATUS_FILTER_QUERY FROM dbo.Customview WITH (NOLOCK) WHERE IDAREA=1;
+INSERT INTO dbo.Operations
+(IDAPPLICATION,IDBATCH,IDPROCESS,IDUSER,IDCLIENT,ApplicationName,BatchName,ProcessName,StationName,Activity,Status,UserName,BoxName,TimeStampOp,StartTime,EndTime,Duration,Images,Files,Docs,ImagesOCR,FilesOCR,DocsOCR,ImagesDV,FilesDV,DocsDV,FieldsDV,RecordsDV,CharsDV,TotalKeysDV,IDUSERPROFILE)
+VALUES(0,'',0,0,0,N'',N'',N'',N'',N'Fixture contract check',N'',N'',N'',GETDATE(),GETDATE(),GETDATE(),0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+INSERT INTO dbo.Operations
+(IDAPPLICATION,IDBATCH,IDPROCESS,IDUSER,IDCLIENT,ApplicationName,BatchName,ProcessName,Activity,Status,UserName,StationName,BoxName,TimeStampOp,StartTime,EndTime,Duration,Notes,Boxes,Images,Files,Docs)
+VALUES(0,'',0,0,0,N'',N'',N'',N'Fixture contract check',N'',N'',N'',N'',GETDATE(),GETDATE(),GETDATE(),0,N'Transaction rolled back',0,0,0,0);
+'@
+        $null = $command.ExecuteNonQuery()
+        $command.Dispose()
+    } finally { $transaction.Rollback(); $transaction.Dispose() }
+    Write-Output 'PASS: Monitor view-settings query and activity-log insert contracts; synthetic events rolled back.'
     $manifest = Get-Content -LiteralPath (Join-Path $root 'fixture/permissions.json') -Raw | ConvertFrom-Json
     foreach ($application in @('MONITOR', 'DATAVALIDATION')) {
         $command = $connection.CreateCommand()
@@ -40,9 +58,9 @@ try {
     $tables = @()
     while ($reader.Read()) { $tables += $reader.GetString(0) }
     $reader.Dispose(); $command.Dispose()
-    $needed = @('UserProfiles', 'UsersUsersProfilesMatch', 'Applications', 'Process', 'Batches', 'Fields')
+    $needed = @('UserProfiles', 'UsersUsersProfilesMatch', 'Customview', 'Operations', 'Applications', 'Process', 'Batches', 'Fields')
     $missing = @($needed | Where-Object { $_ -notin $tables })
-    $report = @{ database_connection = 'passed'; synthetic_credential_query = 'passed'; monitor_active_profile_query = 'passed'; datavalidation_active_profile_query = 'passed'; profile_permission_columns = $manifest.profile_permissions.Count; tables_present = $tables; workflow_tables_missing = $missing; scope = 'Read-only SQL credential/profile checks; does not submit application login' }
+    $report = @{ database_connection = 'passed'; synthetic_credential_query = 'passed'; monitor_active_profile_query = 'passed'; datavalidation_active_profile_query = 'passed'; view_settings_query = 'passed'; operation_insert_contracts = 'passed_rolled_back'; profile_permission_columns = $manifest.profile_permissions.Count; tables_present = $tables; workflow_tables_missing = $missing; scope = 'SQL credential/profile/view checks and rolled-back activity inserts; does not submit application login' }
     $report | ConvertTo-Json -Depth 4 | Set-Content -Encoding UTF8 (Join-Path $root '.local/evidence/local-health.json')
     Write-Output 'PASS: local SQL database connects; synthetic test credentials match.'
     Write-Output ('Tables present: ' + ($tables -join ', '))
