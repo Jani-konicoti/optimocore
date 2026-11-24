@@ -41,3 +41,18 @@ Suggested continuation prompt:
 > Continue the Core executable investigation in this repository. Read AGENTS.md, README.md, docs/HANDOFF.md, docs/FIXTURE.md, and docs/evidence-index.json. Preserve recorded artifact hashes and original inputs. Extend the existing synthetic fixture for profiles and one document workflow; reuse the REA findings and isolated licensing candidate. The original/candidate startup comparison already passed. Keep activation, user login, and workflow acceptance separate. Update the handoff and commit reviewed scripts/findings before ending.
 
 Take turns on the shared branch or work on distinct branches and reconcile before pushing. Record actual checks and unresolved gates at each handoff. Accounts, quotas, credentials, and token balances are not automatically transferred through the repo.
+
+## Publication/access gate
+
+The checkpoint is committed locally. The attempted push to `Jani-konicoti/optimocore` was rejected with HTTP 403 because the signed-in Git account `ilirgjylbegaj73` lacks write permission. The remote must not be described as updated. The owner can grant that account write access, or a coworker with access can import the portable bundle and push the retained history.
+
+The portable handoff is generated under ignored `.local/handoff/optimocore.bundle`. It contains this repository's committed scripts/findings only. A coworker can inspect/import it with:
+
+```powershell
+git clone C:\path\optimocore.bundle optimocore
+cd optimocore
+git remote set-url origin https://github.com/Jani-konicoti/optimocore.git
+git push -u origin main
+```
+
+Obtain the original ZIP separately and follow README reproduction instructions. The local SQL fixture is running and the Monitor test copy was left at its login screen at this checkpoint; those are local session state, not part of the bundle.
