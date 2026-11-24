@@ -58,11 +58,18 @@ VALUES(0,'',0,0,0,N'',N'',N'',N'Fixture contract check',N'',N'',N'',N'',GETDATE(
     $tables = @()
     while ($reader.Read()) { $tables += $reader.GetString(0) }
     $reader.Dispose(); $command.Dispose()
+    $command = $connection.CreateCommand()
+    $command.CommandText = 'SELECT (SELECT COUNT(*) FROM dbo.Applications),(SELECT COUNT(*) FROM dbo.Batches),(SELECT COUNT(*) FROM dbo.Fields)'
+    $reader = $command.ExecuteReader()
+    $null = $reader.Read()
+    $definitions = @{ applications = $reader.GetInt32(0); batches = $reader.GetInt32(1); fields = $reader.GetInt32(2) }
+    $reader.Dispose(); $command.Dispose()
     $needed = @('UserProfiles', 'UsersUsersProfilesMatch', 'Customview', 'Operations', 'Applications', 'Process', 'Batches', 'Fields')
     $missing = @($needed | Where-Object { $_ -notin $tables })
-    $report = @{ database_connection = 'passed'; synthetic_credential_query = 'passed'; monitor_active_profile_query = 'passed'; datavalidation_active_profile_query = 'passed'; view_settings_query = 'passed'; operation_insert_contracts = 'passed_rolled_back'; profile_permission_columns = $manifest.profile_permissions.Count; tables_present = $tables; workflow_tables_missing = $missing; scope = 'SQL credential/profile/view checks and rolled-back activity inserts; does not submit application login' }
+    $report = @{ database_connection = 'passed'; synthetic_credential_query = 'passed'; monitor_active_profile_query = 'passed'; datavalidation_active_profile_query = 'passed'; view_settings_query = 'passed'; operation_insert_contracts = 'passed_rolled_back'; profile_permission_columns = $manifest.profile_permissions.Count; tables_present = $tables; workflow_tables_missing = $missing; workflow_definition_counts = $definitions; scope = 'SQL credential/profile/view checks and rolled-back activity inserts; does not submit application login' }
     $report | ConvertTo-Json -Depth 4 | Set-Content -Encoding UTF8 (Join-Path $root '.local/evidence/local-health.json')
     Write-Output 'PASS: local SQL database connects; synthetic test credentials match.'
     Write-Output ('Tables present: ' + ($tables -join ', '))
-    Write-Output ('Workflow tables still missing: ' + ($missing -join ', '))
+    Write-Output ('Document-workflow tables still missing: ' + ($missing -join ', '))
+    Write-Output "Workflow definitions: $($definitions.applications) applications, $($definitions.batches) batches, $($definitions.fields) fields. Table existence does not establish workflow readiness."
 } finally { $connection.Dispose() }

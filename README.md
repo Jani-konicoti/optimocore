@@ -2,7 +2,7 @@
 
 REA investigation of the supplied **Monitor.exe** and **DataValidation.exe**, with resumable handoffs for three coworkers using their own accounts.
 
-The first pass recovered complete managed member inventories and local C# reconstructions for both executables, traced DataValidation activation into Utility.dll, and tested an isolated modification of that licensing method. A synthetic SQL Server fixture now gets the original DataValidation to activation, the candidate to user login, and Monitor to user login. Full document workflows remain unverified.
+The first pass recovered complete managed member inventories and local C# reconstructions for both executables, traced DataValidation activation into Utility.dll, and tested an isolated modification of that licensing method. On the synthetic SQL Server fixture, manual login has now reached Monitor's main window and the candidate DataValidation's batch selector. The local readiness audit passes 18 workspace query contracts, compiled database-library reads, and 32-bit Jet-template checks. No job or batch is configured yet; document workflows remain unverified.
 
 | Target | Assembly version | Architecture | Framework | Methods inventoried |
 |---|---|---|---|---:|

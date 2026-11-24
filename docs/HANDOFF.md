@@ -1,6 +1,18 @@
 # Team handoff — 24 November 2026
 
-## Current checkpoint
+## Current verified state
+
+The latest local audit supersedes the earlier startup-only notes below. After the user manually submitted both logins, direct accessibility inspection observed Monitor's main Batches window with Logout available and DataValidation's Apri Batch selector. No SQL errors were captured during those login attempts. Sanitized accessibility evidence is retained in ignored `.local/evidence/post-login-ui.json`. A Monitor refresh input failed in the computer-use helper (missing cached bounds/state), so refresh UI acceptance is not claimed.
+
+The fixture now contains 20 inferred tables covering startup, profile/application/process/status lists, the configured Monitor projection, empty field/event definitions, and activity logging. There are **zero configured applications, batches, or fields**. These empty definition tables do not establish document readiness and are not the vendor's complete schema.
+
+`scripts/Test-Readiness.ps1` passes database/profile/activity checks, 18 workspace SQL contracts using populated temporary rows rolled back afterward, actual compiled TableConfig/TableParameters reads, and a read-only 32-bit Jet template/schema check. Original/candidate VerifyKey tests passed all six cases and verify_checkpoint.py verified all 716 inputs unchanged. Initialization was repeated successfully. The launcher now checks workspace contracts before opening the apps. Test reports remain ignored under `.local/evidence`.
+
+`scripts/Watch-LocalErrors.ps1` provides project-only SQL error capture without SQL text (legacy login queries contain passwords). A deliberate marked missing-object probe verified the capture works; that known probe is excluded from application-error reports. The project capture was restarted with one-second dispatch latency after testing, and is left running. It does not capture UI-only exceptions. A failed attempt to change dispatch latency on a running session was corrected by setting it before start; this was a diagnostic-script failure, not an application failure.
+
+**Next task:** build one coherent synthetic job, process, field definition, Jet data file, image, and batch; then verify open, invalid/valid field entry, save, close/reopen, and Monitor listing/state persistence. The empty Fields/Events contracts need extending from actual row accesses before populating them. The supplied script-engine reference-version difference and third-party imaging behavior remain unaccepted. Do not describe this checkpoint as complete feature equivalence or complete document testing. Both existing test processes remain logged in; DataValidation is at its empty batch selector. The personal testing guide remains local and ignored.
+
+## Earlier investigation checkpoints
 
 The first session cloned the initially empty `Jani-konicoti/optimocore` repo into a separate sibling directory. It did not change the Dental Center Albania website.
 
