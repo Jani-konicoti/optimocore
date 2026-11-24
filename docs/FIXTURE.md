@@ -2,9 +2,9 @@
 
 The user authorized creating a database because no backup is available. A minimal **inferred compatibility fixture** now runs in SQL Server 2022 Developer inside the project-specific `optimocore-rea-sql` container, bound only to `127.0.0.1:14333`. Its image is pinned by digest in compose.yaml; SQL memory is limited to 2 GiB inside a 3 GiB container. The project Docker volume retains the synthetic data.
 
-The initial tables are `Config`, `Clients`, and `Users`. Column names come from recovered startup/login SQL and row accesses. Fifty Boolean user-permission columns were recovered from the two login routines. The fixture contains one synthetic customer, one machine row with a deliberately invalid serial, and one synthetic user. It contains no original users, production credentials, customer records, or real documents.
+The fixture tables are `Config`, `Clients`, `Users`, `UserProfiles`, and `UsersUsersProfilesMatch`. Column names come from recovered startup/login/profile queries and row accesses. Fifty Boolean user-permission columns and 58 Boolean profile-permission columns were recovered from the two programs. The fixture contains a synthetic customer, a machine row with a deliberately invalid serial, local test users, and a shared synthetic profile linked to the current test user. It contains no original users, production credentials, customer records, or real documents.
 
-The machine name is generated locally at seed time. SA and application-user passwords are generated locally and kept in ignored `.local/fixture/credentials.json`; the Compose env file and application configs are also ignored. The application test username is `rea_test`. This application stores its test password as expected by its recovered login code; that is a compatibility observation about this isolated fixture.
+The machine name is generated locally at seed time. SA and application-user passwords are generated locally and kept in ignored `.local/fixture/credentials.json`; the Compose env file and application configs are also ignored. Use the current `app_user` value; its initial default was `rea_test`. This application stores its test password as expected by its recovered login code; that is a compatibility observation about this isolated fixture.
 
 ## Reproduce
 
@@ -18,7 +18,7 @@ powershell -NoProfile -File scripts/Initialize-Fixture.ps1
 python scripts/prepare_fixture_runtime.py
 ```
 
-Initialize-Fixture.ps1 seeds only the hard-coded loopback CoreReaFixture database, verifies the synthetic user/password query, and is repeatable. It updates fixture configuration defaults without deleting the database. Configuration Boolean values must be `True`/`False` for paths using `Convert.ToBoolean(string)`; numeric `1` caused a startup exception in the first trial and was corrected.
+Initialize-Fixture.ps1 seeds only the hard-coded loopback CoreReaFixture database, syncs the current local test user's password, and links that user to the synthetic profile. It is repeatable and updates fixture configuration defaults without deleting the database. Configuration Boolean values must be `True`/`False` for paths using `Convert.ToBoolean(string)`; numeric `1` caused a startup exception in the first trial and was corrected. Profile and membership validity columns intentionally use datetime, which supports the recovered query's `Validity_To + 1` expression.
 
 Application copies are under `.local/runtime/fixture-baseline` and `.local/runtime/fixture-candidate`. The latter includes the generated Utility.dll license probe. Both keep the original DataValidation.exe unchanged and point at the same database. Third-party SOAP config is loopback, optional connection slots are empty, and Oracle/NetPC flags retain their expected `N` format.
 
@@ -34,7 +34,7 @@ For an interactive check, run the desired executable from one of those folders. 
 
 The retained accessibility observations are under ignored `.local/evidence`. The original activation observation contains a machine-derived serial, so only the redacted [startup summary](fixture-startup-results.json) is shared. `verify_fixture_observations.py` validates those retained observations and executable/DLL identities before generating the summary; it does not drive the UI itself.
 
-This is application-level confirmation that the candidate gets past the observed activation gate. It is not full workflow acceptance: no UI login was submitted, no profiles/applications/process definitions were populated, and no document was opened or saved. The fixture is not yet the complete vendor schema. Next extend the schema for UserProfiles/UsersUsersProfilesMatch, Applications, Process, Batches, Fields and local Jet data from the actual recovered queries, then validate one synthetic workflow.
+This is application-level confirmation that the candidate gets past the observed activation gate. The user subsequently submitted credentials manually and both programs reported no active profile. That database gate has now been repaired: a synthetic active profile exists, its membership covers the current test user, and both recovered profile-selection predicates return it with correctly typed permission fields. A fresh UI login after this repair is still pending. No document was opened or saved. Next extend Applications, Process, Batches, Fields and local Jet data from the actual recovered queries, then validate one synthetic workflow.
 
 Stop only this project container when finished:
 

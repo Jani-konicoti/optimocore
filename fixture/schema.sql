@@ -32,3 +32,26 @@ CREATE TABLE dbo.Users (
     Power int NOT NULL DEFAULT 1
 );
 GO
+-- Active-profile selection is a separate gate after credential validation.
+-- datetime is intentional: the recovered query uses VALIDITY_TO + 1.
+IF OBJECT_ID(N'dbo.UserProfiles', N'U') IS NULL
+CREATE TABLE dbo.UserProfiles (
+    IDUserProfile int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    IDArea int NOT NULL DEFAULT 1,
+    Name nvarchar(128) NOT NULL UNIQUE,
+    Description nvarchar(255) NOT NULL DEFAULT N'',
+    Line nvarchar(255) NOT NULL DEFAULT N'',
+    Power smallint NOT NULL DEFAULT 1,
+    Active bit NOT NULL DEFAULT 1,
+    Validity_From datetime NOT NULL DEFAULT '20000101',
+    Validity_To datetime NOT NULL DEFAULT '20991231'
+);
+IF OBJECT_ID(N'dbo.UsersUsersProfilesMatch', N'U') IS NULL
+CREATE TABLE dbo.UsersUsersProfilesMatch (
+    IDUser int NOT NULL REFERENCES dbo.Users(IDUser),
+    IDProfile int NOT NULL REFERENCES dbo.UserProfiles(IDUserProfile),
+    Validity_From datetime NOT NULL DEFAULT '20000101',
+    Validity_To datetime NOT NULL DEFAULT '20991231',
+    CONSTRAINT PK_CoreReaUserProfile PRIMARY KEY(IDUser, IDProfile)
+);
+GO

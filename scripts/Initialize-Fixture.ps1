@@ -23,6 +23,14 @@ try {
         $null = $command.ExecuteNonQuery()
         $command.Dispose()
     }
+    if (-not $manifest.profile_permissions) { throw 'Run prepare_fixture.py to derive profile permissions first' }
+    foreach ($name in $manifest.profile_permissions) {
+        if ($name -notmatch '^[A-Z][A-Z0-9_]+$') { throw 'Unsafe profile column name' }
+        $command = $connection.CreateCommand()
+        $command.CommandText = "IF COL_LENGTH(N'dbo.UserProfiles', N'$name') IS NULL ALTER TABLE dbo.UserProfiles ADD [$name] bit NOT NULL DEFAULT 1"
+        $null = $command.ExecuteNonQuery()
+        $command.Dispose()
+    }
     $config = @{
         Customer = 'REA Synthetic Customer'; WindowsAuthentication = 'False';
         DataValidationTimeout = '60'; MonitorTimeout = '60'; ChooseBatch = 'True';
@@ -36,7 +44,7 @@ try {
         $null = $command.ExecuteNonQuery(); $command.Dispose()
     }
     $command = $connection.CreateCommand()
-    $command.CommandText = 'IF NOT EXISTS(SELECT 1 FROM dbo.Clients WHERE Name=@machine) INSERT dbo.Clients(Name,Serial) VALUES(@machine,N''INVALID-SYNTHETIC-SERIAL''); IF NOT EXISTS(SELECT 1 FROM dbo.Users WHERE UserName=@user) INSERT dbo.Users(UserName,UserNetName,Password,Description) VALUES(@user,@user,@password,N''Synthetic fixture user'')'
+    $command.CommandText = 'IF NOT EXISTS(SELECT 1 FROM dbo.Clients WHERE Name=@machine) INSERT dbo.Clients(Name,Serial) VALUES(@machine,N''INVALID-SYNTHETIC-SERIAL''); IF NOT EXISTS(SELECT 1 FROM dbo.Users WHERE UserName=@user) INSERT dbo.Users(UserName,UserNetName,Password,Description) VALUES(@user,@user,@password,N''Synthetic fixture user'') ELSE UPDATE dbo.Users SET Password=@password WHERE UserName=@user; IF NOT EXISTS(SELECT 1 FROM dbo.UserProfiles WHERE Name=N''REA Synthetic Profile'') INSERT dbo.UserProfiles(Name,Description,Active) VALUES(N''REA Synthetic Profile'',N''Local test profile'',1); DECLARE @profile int=(SELECT IDUserProfile FROM dbo.UserProfiles WHERE Name=N''REA Synthetic Profile''); DECLARE @id int=(SELECT IDUser FROM dbo.Users WHERE UserName=@user); IF NOT EXISTS(SELECT 1 FROM dbo.UsersUsersProfilesMatch WHERE IDUser=@id AND IDProfile=@profile) INSERT dbo.UsersUsersProfilesMatch(IDUser,IDProfile) VALUES(@id,@profile)'
     $null = $command.Parameters.AddWithValue('@machine', [Environment]::MachineName.ToUpperInvariant())
     $null = $command.Parameters.AddWithValue('@user', $credentials.app_user)
     $null = $command.Parameters.AddWithValue('@password', $credentials.app_password)
@@ -47,7 +55,7 @@ try {
     $null = $command.Parameters.AddWithValue('@password', $credentials.app_password)
     if ([int]$command.ExecuteScalar() -ne 1) { throw 'Synthetic login fixture verification failed' }
     $command.Dispose()
-    $report = @{ database = 'CoreReaFixture'; endpoint = '127.0.0.1,14333'; config_rows_seeded = $config.Count; permission_columns = $manifest.permissions.Count; synthetic_login_query_passed = $true; scope = 'SQL fixture checks; original application login not yet accepted' }
+    $report = @{ database = 'CoreReaFixture'; endpoint = '127.0.0.1,14333'; config_rows_seeded = $config.Count; permission_columns = $manifest.permissions.Count; profile_permission_columns = $manifest.profile_permissions.Count; synthetic_login_query_passed = $true; scope = 'SQL fixture checks; original application login not yet accepted' }
     $report | ConvertTo-Json | Set-Content -Encoding UTF8 (Join-Path $root '.local/fixture/verification.json')
-    Write-Output 'Created CoreReaFixture with synthetic Config, Clients, and Users; login fixture query passed.'
+    Write-Output 'Initialized local fixture, synced test credentials, and linked the current test user to the synthetic profile.'
 } finally { $connection.Dispose() }
