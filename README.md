@@ -12,7 +12,7 @@ The first pass recovered complete managed member inventories and local C# recons
 
 Start with [the handoff](docs/HANDOFF.md), [the local fixture](docs/FIXTURE.md), [Monitor findings](docs/MONITOR.md), [DataValidation findings](docs/DATAVALIDATION.md), [dependencies](docs/DEPENDENCIES.md), and the [evidence index](docs/evidence-index.json).
 
-For the already-prepared local setup, use the plain-language [testing walkthrough](docs/TESTING.md). `powershell -NoProfile -File scripts/Start-Local.ps1` checks the local fixture and opens both test programs.
+For the already-prepared local setup, `powershell -NoProfile -File scripts/Start-Local.ps1` checks the local fixture and opens both test programs.
 
 ## Reproduce on Windows
 
