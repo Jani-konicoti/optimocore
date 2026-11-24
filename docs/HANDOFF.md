@@ -20,6 +20,8 @@ The first all-types REA member calls hit the default 64 MiB representation allow
 
 ## Next unresolved gate
 
+Local retest on 24 November 2026: SQL connectivity and the synthetic credential query passed; only Clients, Config, and Users are present. Both test copies were launched and their login dialogs were observed, with no application error and no DataValidation activation dialog. The six licensing method cases passed again, and all 716 input hashes were verified unchanged. No UI login was submitted. `scripts/Start-Local.ps1`, `scripts/Test-Local.ps1`, and docs/TESTING.md now provide the repeatable launch/check/manual-testing path. Both test application windows were left open for the user.
+
 **The fixture still needs the schema/data for profiles and a document workflow.** A local master fixture now exists, but it is deliberately a minimal inferred compatibility schema, not a recovered vendor database. No backup is expected; the user authorized creating the fixture. Do not wait for an account quota to expire to preserve work; commit a usable checkpoint whenever stopping.
 
 The original archive's production connection values were not used. The candidate was not installed in the original Core folder. Passing the observed activation gate to user login is verified; user login, batch save/close, Monitor mutation/export, and third-party component licensing remain unverified.

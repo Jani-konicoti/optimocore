@@ -12,6 +12,8 @@ The first pass recovered complete managed member inventories and local C# recons
 
 Start with [the handoff](docs/HANDOFF.md), [the local fixture](docs/FIXTURE.md), [Monitor findings](docs/MONITOR.md), [DataValidation findings](docs/DATAVALIDATION.md), [dependencies](docs/DEPENDENCIES.md), and the [evidence index](docs/evidence-index.json).
 
+For the already-prepared local setup, use the plain-language [testing walkthrough](docs/TESTING.md). `powershell -NoProfile -File scripts/Start-Local.ps1` checks the local fixture and opens both test programs.
+
 ## Reproduce on Windows
 
 Requirements: Python 3.12+, Git, Windows PowerShell/.NET Framework, and a compatible .NET runtime for optional ILSpy export. The initial machine has .NET 9.0.11; ILSpy runs with major-version roll-forward. No SDK was installed, no global Node was upgraded, and no account credentials were shared.
