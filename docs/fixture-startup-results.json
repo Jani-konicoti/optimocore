@@ -1,0 +1,21 @@
+{
+  "scope": "Application startup to activation/login on a synthetic local database; user login and document workflow not accepted",
+  "database": {
+    "scope": "SQL fixture checks; original application login not yet accepted",
+    "synthetic_login_query_passed": true,
+    "permission_columns": 50,
+    "endpoint": "127.0.0.1,14333",
+    "database": "CoreReaFixture",
+    "config_rows_seeded": 8
+  },
+  "datavalidation_original": "Activation dialog blocks login",
+  "datavalidation_candidate": "Login dialog with user/password controls; no activation dialog",
+  "monitor_original": "Monitor shell and Login dialog; no application error observed",
+  "original_executable_sha256_unchanged": true,
+  "candidate_utility_sha256": "dd0e2d6caa01ba137652cb01fd2e70d9592408c1646df23e93bab8c232adc653",
+  "local_observation_files": [
+    "datavalidation-fixture-baseline-ui.txt",
+    "datavalidation-fixture-candidate-ui.txt",
+    "monitor-fixture-ui.txt"
+  ]
+}

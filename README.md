@@ -1,0 +1,41 @@
+# Core executable investigation
+
+REA investigation of the supplied **Monitor.exe** and **DataValidation.exe**, with resumable handoffs for three coworkers using their own accounts.
+
+The first pass recovered complete managed member inventories and local C# reconstructions for both executables, traced DataValidation activation into Utility.dll, and tested an isolated modification of that licensing method. A synthetic SQL Server fixture now gets the original DataValidation to activation, the candidate to user login, and Monitor to user login. Full document workflows remain unverified.
+
+| Target | Assembly version | Architecture | Framework | Methods inventoried |
+|---|---|---|---|---:|
+| Monitor.exe | 3.4.9.73 | x86, 32-bit required | .NET Framework 4.0 | 2,604 |
+| DataValidation.exe | 3.4.9.76 | x86, 32-bit required | .NET Framework 4.0 | 1,631 |
+| Utility.dll | 1.0.1.3 | IL-only library | See evidence index | 41 |
+
+Start with [the handoff](docs/HANDOFF.md), [the local fixture](docs/FIXTURE.md), [Monitor findings](docs/MONITOR.md), [DataValidation findings](docs/DATAVALIDATION.md), [dependencies](docs/DEPENDENCIES.md), and the [evidence index](docs/evidence-index.json).
+
+## Reproduce on Windows
+
+Requirements: Python 3.12+, Git, Windows PowerShell/.NET Framework, and a compatible .NET runtime for optional ILSpy export. The initial machine has .NET 9.0.11; ILSpy runs with major-version roll-forward. No SDK was installed, no global Node was upgraded, and no account credentials were shared.
+
+Clone this repository, obtain the input ZIP privately, and run from the repository root:
+
+```powershell
+python scripts/prepare_input.py 'C:\path\wetransfer_4s-core_2026-11-23_0938.zip'
+python scripts/bootstrap_tools.py
+python scripts/analyze.py
+python scripts/create_license_probe.py
+powershell -NoProfile -File scripts/Test-LicenseProbe.ps1 -Mode Baseline
+powershell -NoProfile -File scripts/Test-LicenseProbe.ps1 -Mode Candidate
+powershell -NoProfile -File scripts/Export-Reconstruction.ps1
+```
+
+The shared dependency reconstruction used for Config schema analysis can be exported with the same ILSpy command against `.local/input/4s core/Core/FourServiceLibraries.dll`, writing only under `.local/decompiled/FourServiceLibraries`.
+
+REA is pinned to 6.10.1, portable Node to 24.22.3, and ILSpy command line to 9.1.0.7988. Tools and input remain inside `.local`. `python scripts/analyze.py --reuse` validates and indexes existing complete records instead of repeating the analysis. Fresh local paths may produce different Evidence IDs; preserve the artifact hashes and MVIDs when comparing investigations.
+
+Expected method-test result: the three deliberately invalid activation inputs return `-1` for the original and `36500` as `System.Int64` for the candidate. The candidate is `.local/candidates/license-probe/Utility.dll`. It has **not** been installed into the original Core folder. These tests establish the licensing method's behavior; the separate fixture startup comparison establishes that the candidate passes the observed activation gate to user login.
+
+`prepare_smoke.py` creates an unpatched application copy with blank database settings and a loopback service endpoint. The observed DataValidation startup error was `The ConnectionString property has not been initialized`, in `SerialLeggiDalRegistro` called by `frmMain_Load`. This test intentionally cannot exercise a configured database. Do not describe it as successful application activation.
+
+## Sharing
+
+The ZIP, original executables, recovered source, connection strings, logs, database files, and patched DLL are ignored by Git. Coworkers reproduce those locally from the same privately supplied archive; only scripts and sanitized evidence summaries belong in this repository. A push shares a checkpoint, not a transfer of an account's remaining token allowance.

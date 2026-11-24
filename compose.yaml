@@ -1,0 +1,17 @@
+services:
+  sql:
+    image: mcr.microsoft.com/mssql/server:2022-latest@sha256:4525e3efac9f3e241cb003bb2ff2a82818b502f37e12049d788b1a9fa7e13b7f
+    container_name: optimocore-rea-sql
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: ${CORE_REA_SA_PASSWORD:?Run scripts/prepare_fixture.py first}
+      MSSQL_MEMORY_LIMIT_MB: "2048"
+    ports:
+      - "127.0.0.1:14333:1433"
+    mem_limit: 3g
+    cpus: 2
+    volumes:
+      - core-rea-sql:/var/opt/mssql
+volumes:
+  core-rea-sql:

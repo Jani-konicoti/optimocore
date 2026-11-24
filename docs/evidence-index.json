@@ -1,0 +1,357 @@
+{
+  "tool": "rea-agents@6.10.1",
+  "scope": "Static managed inspection; no application execution",
+  "artifacts": [
+    {
+      "name": "DataValidation.exe",
+      "sha256": "bd73afb20d1fe70a393d52774628fcaab8bef8ec22ecd96760bf2c05dbca11c0",
+      "byte_length": 1440768,
+      "assembly_version": "3.4.9.76",
+      "mvid": "d74808a9-03f2-4e3f-b101-c198aff91fa6",
+      "classification": {
+        "status": "managed",
+        "container": "pe",
+        "runtime_family": "dotnet-framework",
+        "implementation": "cil",
+        "managed_architecture": "x86",
+        "evidence": [
+          {
+            "code": "cli-header-observed",
+            "detail": "A file-backed PE CLI header and metadata root were admitted.",
+            "file_offset": 520
+          },
+          {
+            "code": "target-framework-observed",
+            "detail": "An assembly-level TargetFrameworkAttribute names .NET Framework.",
+            "file_offset": 1211410
+          },
+          {
+            "code": "managed-architecture-derived",
+            "detail": "Managed architecture x86 is derived from PE machine and CLI flags.",
+            "file_offset": 536
+          }
+        ]
+      },
+      "frameworks": [
+        ".NETFramework,Version=v4.0"
+      ],
+      "metadata_coverage": "complete",
+      "member_coverage": {
+        "state": "complete",
+        "issues": []
+      },
+      "counts": {
+        "types": 100,
+        "fields": 826,
+        "methods": 1631,
+        "member_refs": 1309,
+        "call_edges": 27052,
+        "field_accesses": 5780
+      },
+      "user_string_count": 1934,
+      "references": [
+        {
+          "name": "mscorlib",
+          "version": "4.0.0.0"
+        },
+        {
+          "name": "Microsoft.VisualBasic",
+          "version": "10.0.0.0"
+        },
+        {
+          "name": "System.Drawing",
+          "version": "4.0.0.0"
+        },
+        {
+          "name": "System",
+          "version": "4.0.0.0"
+        },
+        {
+          "name": "System.Windows.Forms",
+          "version": "4.0.0.0"
+        },
+        {
+          "name": "GdPicture.NET.9",
+          "version": "9.4.0.3"
+        },
+        {
+          "name": "Utility",
+          "version": "1.0.1.3"
+        },
+        {
+          "name": "FourService.Script",
+          "version": "1.4.0.3"
+        },
+        {
+          "name": "System.Data",
+          "version": "4.0.0.0"
+        },
+        {
+          "name": "FourService.Script.Parameters",
+          "version": "1.0.0.5"
+        },
+        {
+          "name": "FourServiceLibraries",
+          "version": "1.4.9.6"
+        },
+        {
+          "name": "System.Web.Services",
+          "version": "4.0.0.0"
+        },
+        {
+          "name": "System.Xml",
+          "version": "4.0.0.0"
+        },
+        {
+          "name": "System.Management",
+          "version": "4.0.0.0"
+        },
+        {
+          "name": "FourService.Script.Engine",
+          "version": "1.0.6327.16335"
+        },
+        {
+          "name": "System.Core",
+          "version": "4.0.0.0"
+        },
+        {
+          "name": "System.Data.OracleClient",
+          "version": "4.0.0.0"
+        },
+        {
+          "name": "FourService.DataEntryComboBox",
+          "version": "1.0.0.0"
+        },
+        {
+          "name": "System.Data.DataSetExtensions",
+          "version": "4.0.0.0"
+        },
+        {
+          "name": "Impaginatore",
+          "version": "2.0.16.2"
+        }
+      ],
+      "artifact_evidence_id": "ev_4230238b1b53e3ca78100821f42a37eeebfd09762714d5156fc28b0f8f2ca0f7",
+      "member_evidence_id": "ev_f7328bfacc3b9e86a150dd78b7a1093016a7d5ee3c0ed7ad250fd68bfbee5dd2",
+      "local_artifact_evidence": ".local/evidence/datavalidation-artifact.json",
+      "local_member_evidence": ".local/evidence/datavalidation-complete-members.json",
+      "limitations": [
+        "Metadata tokens are build-local coordinates and are only meaningful with the reported artifact SHA-256 and MVID.",
+        "CIL instruction anchors are decoded from file-backed method bodies only; no target assembly is loaded or executed.",
+        "Field constants are file-backed Constant-table declarations, not runtime field values. Parameter and property defaults and enum-name mappings are not decoded.",
+        "Exported types are reported from ExportedType rows as declared; forwarded types are not resolved in their implementing assemblies.",
+        "User strings are the #US literals loaded by ldstr in the inspected method bodies, with their own coverage; instruction anchors and normalized CIL digests keep their build-local tokens.",
+        "Member signatures decode ECMA-335 primitive, class, valuetype, generic instantiation, generic variable, pointer, byref, single-dimension and general array, function pointer including VARARG sentinels, custom modifier, and typed reference forms; type operands keep their encoded TypeDefOrRefOrSpec values and append readable TypeDef/TypeRef names when resolved."
+      ]
+    },
+    {
+      "name": "Monitor.exe",
+      "sha256": "ac86a5241b0fdd4f13e4584f44d66a8693b40f2d684f5541baca9fb9c9c102d4",
+      "byte_length": 3968000,
+      "assembly_version": "3.4.9.73",
+      "mvid": "3f7e6564-3aac-4f67-ac54-6f8b82373506",
+      "classification": {
+        "status": "managed",
+        "container": "pe",
+        "runtime_family": "dotnet-framework",
+        "implementation": "cil",
+        "managed_architecture": "x86",
+        "evidence": [
+          {
+            "code": "cli-header-observed",
+            "detail": "A file-backed PE CLI header and metadata root were admitted.",
+            "file_offset": 520
+          },
+          {
+            "code": "target-framework-observed",
+            "detail": "An assembly-level TargetFrameworkAttribute names .NET Framework.",
+            "file_offset": 3564052
+          },
+          {
+            "code": "managed-architecture-derived",
+            "detail": "Managed architecture x86 is derived from PE machine and CLI flags.",
+            "file_offset": 536
+          }
+        ]
+      },
+      "frameworks": [
+        ".NETFramework,Version=v4.0"
+      ],
+      "metadata_coverage": "complete",
+      "member_coverage": {
+        "state": "complete",
+        "issues": []
+      },
+      "counts": {
+        "types": 86,
+        "fields": 1457,
+        "methods": 2604,
+        "member_refs": 1664,
+        "call_edges": 51577,
+        "field_accesses": 8099
+      },
+      "user_string_count": 3560,
+      "references": [
+        {
+          "name": "mscorlib",
+          "version": "4.0.0.0"
+        },
+        {
+          "name": "Microsoft.VisualBasic",
+          "version": "10.0.0.0"
+        },
+        {
+          "name": "System.Drawing",
+          "version": "4.0.0.0"
+        },
+        {
+          "name": "System",
+          "version": "4.0.0.0"
+        },
+        {
+          "name": "System.Windows.Forms",
+          "version": "4.0.0.0"
+        },
+        {
+          "name": "GdPicture.NET.9",
+          "version": "9.4.0.3"
+        },
+        {
+          "name": "System.Data",
+          "version": "4.0.0.0"
+        },
+        {
+          "name": "DataGridView4Service",
+          "version": "1.0.0.0"
+        },
+        {
+          "name": "FourService.Script",
+          "version": "1.4.0.3"
+        },
+        {
+          "name": "FourServiceLibraries",
+          "version": "1.4.9.6"
+        },
+        {
+          "name": "FourService.TreeView",
+          "version": "1.0.0.1"
+        },
+        {
+          "name": "FourService.Script.Parameters",
+          "version": "1.0.0.5"
+        },
+        {
+          "name": "ICSharpCode.SharpZipLib",
+          "version": "0.86.0.518"
+        },
+        {
+          "name": "System.Data.DataSetExtensions",
+          "version": "4.0.0.0"
+        },
+        {
+          "name": "System.Core",
+          "version": "4.0.0.0"
+        },
+        {
+          "name": "FourService.Script.Engine",
+          "version": "1.0.6327.16398"
+        },
+        {
+          "name": "System.Data.OracleClient",
+          "version": "4.0.0.0"
+        },
+        {
+          "name": "FourService.DataEntryComboBox",
+          "version": "1.0.0.0"
+        }
+      ],
+      "artifact_evidence_id": "ev_e11b4320d2a0c030b6d241b77b5fbc69f4c13a76b1277a6ad3fb8a65402332a6",
+      "member_evidence_id": "ev_4e51ab46f0132b3de6f7c3e625f039f23c824038af9a8e09fab2b7f3b0dd498c",
+      "local_artifact_evidence": ".local/evidence/monitor-artifact.json",
+      "local_member_evidence": ".local/evidence/monitor-complete-members.json",
+      "limitations": [
+        "Metadata tokens are build-local coordinates and are only meaningful with the reported artifact SHA-256 and MVID.",
+        "CIL instruction anchors are decoded from file-backed method bodies only; no target assembly is loaded or executed.",
+        "Field constants are file-backed Constant-table declarations, not runtime field values. Parameter and property defaults and enum-name mappings are not decoded.",
+        "Exported types are reported from ExportedType rows as declared; forwarded types are not resolved in their implementing assemblies.",
+        "User strings are the #US literals loaded by ldstr in the inspected method bodies, with their own coverage; instruction anchors and normalized CIL digests keep their build-local tokens.",
+        "Member signatures decode ECMA-335 primitive, class, valuetype, generic instantiation, generic variable, pointer, byref, single-dimension and general array, function pointer including VARARG sentinels, custom modifier, and typed reference forms; type operands keep their encoded TypeDefOrRefOrSpec values and append readable TypeDef/TypeRef names when resolved."
+      ]
+    },
+    {
+      "name": "Utility.dll",
+      "sha256": "c067099afba5890a673c25b168db8517e645410c7fe7dccea4b223cb73ed25db",
+      "byte_length": 20480,
+      "assembly_version": "1.0.1.3",
+      "mvid": "75f2be4b-3a6a-41c0-b536-506a860906cd",
+      "classification": {
+        "status": "managed",
+        "container": "pe",
+        "runtime_family": "unknown",
+        "implementation": "cil",
+        "managed_architecture": "anycpu",
+        "evidence": [
+          {
+            "code": "cli-header-observed",
+            "detail": "A file-backed PE CLI header and metadata root were admitted.",
+            "file_offset": 1032
+          },
+          {
+            "code": "managed-architecture-derived",
+            "detail": "Managed architecture anycpu is derived from PE machine and CLI flags.",
+            "file_offset": 1048
+          }
+        ]
+      },
+      "frameworks": [],
+      "metadata_coverage": "complete",
+      "member_coverage": {
+        "state": "complete",
+        "issues": []
+      },
+      "counts": {
+        "types": 10,
+        "fields": 8,
+        "methods": 41,
+        "member_refs": 120,
+        "call_edges": 332,
+        "field_accesses": 18
+      },
+      "user_string_count": 49,
+      "references": [
+        {
+          "name": "mscorlib",
+          "version": "2.0.0.0"
+        },
+        {
+          "name": "Microsoft.VisualBasic",
+          "version": "8.0.0.0"
+        },
+        {
+          "name": "System",
+          "version": "2.0.0.0"
+        },
+        {
+          "name": "System.Management",
+          "version": "2.0.0.0"
+        },
+        {
+          "name": "System.Data",
+          "version": "2.0.0.0"
+        }
+      ],
+      "artifact_evidence_id": "ev_c52d1c1e5055b97a5d17e20493da5f4b5144f863d3f06f89dde956d8d9ca39ac",
+      "member_evidence_id": "ev_88535655ce3381ab7862e8978596153722ac8a2aaad673f460fe51bac87ce228",
+      "local_artifact_evidence": ".local/evidence/utility-artifact.json",
+      "local_member_evidence": ".local/evidence/utility-members.json",
+      "limitations": [
+        "Metadata tokens are build-local coordinates and are only meaningful with the reported artifact SHA-256 and MVID.",
+        "CIL instruction anchors are decoded from file-backed method bodies only; no target assembly is loaded or executed.",
+        "Field constants are file-backed Constant-table declarations, not runtime field values. Parameter and property defaults and enum-name mappings are not decoded.",
+        "Exported types are reported from ExportedType rows as declared; forwarded types are not resolved in their implementing assemblies.",
+        "User strings are the #US literals loaded by ldstr in the inspected method bodies, with their own coverage; instruction anchors and normalized CIL digests keep their build-local tokens.",
+        "Member signatures decode ECMA-335 primitive, class, valuetype, generic instantiation, generic variable, pointer, byref, single-dimension and general array, function pointer including VARARG sentinels, custom modifier, and typed reference forms; type operands keep their encoded TypeDefOrRefOrSpec values and append readable TypeDef/TypeRef names when resolved."
+      ]
+    }
+  ]
+}
