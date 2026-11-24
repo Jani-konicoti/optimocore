@@ -42,11 +42,11 @@ Suggested continuation prompt:
 
 Take turns on the shared branch or work on distinct branches and reconcile before pushing. Record actual checks and unresolved gates at each handoff. Accounts, quotas, credentials, and token balances are not automatically transferred through the repo.
 
-## Publication/access gate
+## Publication status
 
-The checkpoint is committed locally. The attempted push to `Jani-konicoti/optimocore` was rejected with HTTP 403 because the signed-in Git account `ilirgjylbegaj73` lacks write permission. The remote must not be described as updated. The owner can grant that account write access, or a coworker with access can import the portable bundle and push the retained history.
+The checkpoint was successfully pushed to `Jani-konicoti/optimocore` on `main`. The remote SHA was verified as `458b813a171df4f584cd0a5e6f838e52f7fac25a` before this status update. The earlier HTTP 403 access blocker is resolved. Coworkers can clone the GitHub repository directly and follow the reproduction and continuation steps above.
 
-The portable handoff is generated under ignored `.local/handoff/optimocore.bundle`. It contains this repository's committed scripts/findings only. A coworker can inspect/import it with:
+The optional offline handoff under ignored `.local/handoff/optimocore.bundle` retains the earlier `458b813` checkpoint. It contains committed scripts/findings only, and can be imported with:
 
 ```powershell
 git clone C:\path\optimocore.bundle optimocore
