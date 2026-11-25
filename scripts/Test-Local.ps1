@@ -19,16 +19,25 @@ try {
     $command.Dispose()
     $command = $connection.CreateCommand()
     $command.CommandText = @'
-SELECT u.UserName FROM dbo.Users u
+SELECT DISTINCT u.UserName FROM dbo.Users u
 INNER JOIN dbo.UsersUsersProfilesMatch m ON u.IDUser=m.IDUser
 INNER JOIN dbo.UserProfiles p ON m.IDProfile=p.IDUserProfile
-WHERE u.Active=1 AND p.IDUserProfile=(SELECT IDUserProfile FROM dbo.UserProfiles WHERE Name=N'REA Synthetic Profile')
-AND u.UserName=@user;
+INNER JOIN dbo.AreasApplicationsMatch ap1 ON ap1.IDArea=1
+INNER JOIN dbo.AreasApplicationsMatch ap2 ON ap2.IDApplication=ap1.IDApplication
+WHERE m.Validity_From<=GETDATE() AND m.Validity_To+1>=GETDATE()
+AND p.Validity_From<=GETDATE() AND p.Validity_To+1>=GETDATE()
+AND u.Active=1 AND (p.DataValidation=1 OR p.ImageHighlighter=1)
+AND p.IDArea=ap2.IDArea AND u.UserName=@user;
 '@
     $null = $command.Parameters.AddWithValue('@user', $credentials.app_user)
     if ([string]$command.ExecuteScalar() -ne $credentials.app_user) { throw 'Monitor Sessions active-user lookup failed' }
     $command.Dispose()
     Write-Output 'PASS: Monitor Sessions active-user lookup returns the synthetic test user.'
+    $command = $connection.CreateCommand()
+    $command.CommandText = "SELECT DISTINCT Description FROM dbo.Lines WHERE IDArea=1 AND Description=N'REA Test Line'"
+    if ([string]$command.ExecuteScalar() -ne 'REA Test Line') { throw 'Monitor Sessions line lookup failed' }
+    $command.Dispose()
+    Write-Output 'PASS: Monitor Sessions line lookup returns the synthetic test line.'
     # Exercise the recovered column contracts without retaining fabricated events.
     $transaction = $connection.BeginTransaction()
     try {

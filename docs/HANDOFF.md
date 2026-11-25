@@ -1,5 +1,11 @@
 # Team handoff — 24 November 2026
 
+## 25 November checkpoint — Sessions dropdown passed in Monitor
+
+- After `Users.Active` was added, the live Sessions tab exposed two more missing objects: `UserProfiles.ImageHighlighter` and `dbo.Lines`. Added an inferred `bit` flag defaulting to `0` and the minimal `Lines` table with one synthetic line in the test area. The test user qualifies through the existing DataValidation profile flag.
+- The SQL checks exercise the Sessions user lookup with the area joins, profile and membership validity, and DataValidation/ImageHighlighter predicate. The line lookup and existing batch checks also pass. The REA record for the exact Monitor build in the previous checkpoint covers the predicate and line queries at string tokens `0x7001104d`, `0x700111be` and `0x7001120c`.
+- In the signed-in Monitor UI, switched from Batches back to `Sessioni`. No SQL dialog appeared. Opening `Utente` displayed `rea_test (Synthetic fixture user)`. This verifies dropdown loading. Session search and exports were outside this test.
+
 ## 25 November checkpoint — Sessions user lookup
 
 - Monitor's Sessions dropdown query filters `dbo.Users.Active = 1` and joins the selected profile through `UsersUsersProfilesMatch`. The exact-build REA record `ev_1a5bb9feee2f07557d7e33118c607f7b1706649d68b5c82aaa006dfff5b08713` contains the SQL literal at `0x7001066c` (Monitor SHA-256 `ac86a5241b0fdd4f13e4584f44d66a8693b40f2d684f5541baca9fb9c9c102d4`, MVID `3f7e6564-3aac-4f67-ac54-6f8b82373506`). Added a guarded `Active` bit column with a default of `1` for synthetic users and applied it to the running loopback fixture.

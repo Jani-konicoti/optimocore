@@ -49,6 +49,9 @@ CREATE TABLE dbo.UserProfiles (
     Validity_From datetime NOT NULL DEFAULT '20000101',
     Validity_To datetime NOT NULL DEFAULT '20991231'
 );
+-- Sessions includes users with either DataValidation or ImageHighlighter profiles.
+IF COL_LENGTH(N'dbo.UserProfiles', N'ImageHighlighter') IS NULL
+    ALTER TABLE dbo.UserProfiles ADD ImageHighlighter bit NOT NULL DEFAULT 0;
 IF OBJECT_ID(N'dbo.UsersUsersProfilesMatch', N'U') IS NULL
 CREATE TABLE dbo.UsersUsersProfilesMatch (
     IDUser int NOT NULL REFERENCES dbo.Users(IDUser),
@@ -111,6 +114,12 @@ GO
 -- Monitor batch-list fixture. The seeded process has no profile mapping.
 IF OBJECT_ID(N'dbo.Areas', N'U') IS NULL
 CREATE TABLE dbo.Areas (IDArea int NOT NULL PRIMARY KEY);
+IF OBJECT_ID(N'dbo.Lines', N'U') IS NULL
+CREATE TABLE dbo.Lines (
+    IDArea int NOT NULL REFERENCES dbo.Areas(IDArea),
+    Description nvarchar(128) NOT NULL,
+    PRIMARY KEY (IDArea, Description)
+);
 IF OBJECT_ID(N'dbo.Applications', N'U') IS NULL
 CREATE TABLE dbo.Applications (
     IDApplication int NOT NULL PRIMARY KEY,
@@ -224,6 +233,8 @@ IF COL_LENGTH(N'dbo.Batches', N'Convertito') IS NULL
 GO
 IF NOT EXISTS (SELECT 1 FROM dbo.Areas WHERE IDArea=1)
     INSERT dbo.Areas(IDArea) VALUES (1);
+IF NOT EXISTS (SELECT 1 FROM dbo.Lines WHERE IDArea=1 AND Description=N'REA Test Line')
+    INSERT dbo.Lines(IDArea,Description) VALUES (1,N'REA Test Line');
 IF NOT EXISTS (SELECT 1 FROM dbo.Applications WHERE IDApplication=1)
     INSERT dbo.Applications(IDApplication,IDArea,Active,Name,Description,Customer)
     VALUES (1,1,1,N'REA Monitor',N'Synthetic Monitor application',N'REA Synthetic Customer');
