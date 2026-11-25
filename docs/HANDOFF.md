@@ -1,5 +1,10 @@
 # Team handoff — 24 November 2026
 
+## 25 November checkpoint — reversible Monitor batch priority change passed
+
+- In the isolated Monitor Sessions CSV candidate, loaded synthetic batch `REA-BATCH-001` from loopback `CoreReaFixture`. Used `Batch` → `Cambia priorità` to change priority from `0` to `1`. Refreshed via `Ricerca` and verified `1` in both the grid and an independent SQL read.
+- Restored priority to `0` through the same Monitor control, refreshed, and verified `0` in the grid and SQL. Status remained `READY`. SQL row versions advanced on the two saves. This accepts the priority-change round trip only.
+
 ## 25 November checkpoint — Sessions CSV diagnosis and candidate
 
 - Baseline `Esporta in Csv` fails with a null reference and leaves a headers-only file. Exact-build Monitor REA record `ev_1a5bb9feee2f07557d7e33118c607f7b1706649d68b5c82aaa006dfff5b08713` shows the bindings: Sessions search `0x060004b8` passes a `DataTable` to the grid, CSV handler `0x060004ee` delegates to `EsportaGrigliaInCsv` (`0x060004eb`), and the shared exporter casts the data source to `DataView` before calling `ToTable()` without a null check. Its source-table loop does not consult row selection.
