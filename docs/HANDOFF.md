@@ -1,5 +1,25 @@
 # Team handoff — 24 November 2026
 
+## 25 November checkpoint — supplied Core scan and Monitor batch-list trace
+
+- Inventoried all 83 supplied top-level files. REA inspected 49 PE files: 45 assemblies had complete managed metadata coverage, and four native 32-bit GdPicture components had complete PE import-table coverage. The other 34 files were checked with local read-only tools for XML parsing, text readability, or binary headers. The scan did not execute any target or interpret file contents as instructions. Per-file hashes and scan references are under ignored `.local/evidence/core-supplied-scan-2026-11-25.json`.
+- The SHA-256 and MVID for Monitor, DataValidation and Utility match the existing evidence index. The supplied scripting engine is `1.0.6327.16398`, matching Monitor’s reference. DataValidation references `1.0.6327.16335`. This is a static version discrepancy with no runtime binding result.
+- Both `.4db` files and `Empty.mdb` have identical SHA-256 hashes and Jet headers. The Windows 32-bit Jet provider successfully enumerated tables on a local copy opened in read mode, including `BatchInfo`, `Data`, `History` and `Associate`. This established table presence only. No rows were inspected and no batch workflow was run.
+- Monitor’s batch-list trace below identifies additional fixture dependencies. At this checkpoint this checkout had no prepared test runtime or fixture credentials, the Docker client could not reach its engine, and TCP `127.0.0.1:14333` was unreachable. The next runtime check is Monitor login with a synthetic user followed by listing and filtering one synthetic batch. Record which query branches actually run before adding more tables or exercising writes. DataValidation workflow acceptance also requires a supported activation path and a valid synthetic user login.
+
+### Monitor batch-list fixture contract
+
+REA evidence `ev_1a5bb9feee2f07557d7e33118c607f7b1706649d68b5c82aaa006dfff5b08713` covers the selected `ForService.frmMainMonitor` type in Monitor SHA-256 `ac86a5241b0fdd4f13e4584f44d66a8693b40f2d684f5541baca9fb9c9c102d4`, MVID `3f7e6564-3aac-4f67-ac54-6f8b82373506`. The table lists dependencies observed in SQL literals loaded by the named methods. It does not establish the vendor schema or which branches execute with the fixture’s profile.
+
+| Method and token | Observed SQL dependency |
+|---|---|
+| `DBCaricaComboApplicazioni` (`0x06000419`) | Reads active `Applications`. Another branch joins `AreasApplicationsMatch`, `Areas`, `UserProfiles` and `Process`. |
+| `DBCaricaComboStati` (`0x06000417`) | Reads `Status` including `Name`, `MinPower`, `Color` and `IDApplication`. Application selection joins area/profile tables and `Process`. |
+| `CaricaProcessiEseguibili` (`0x06000418`) | Reads manual `Process` rows by profile via `UserProfilesProcessMatch`, with an application filter. |
+| `SearchingBatch` (`0x0600041c`) | Builds a query over `Batches` with application and batch ID filters. Also reads `IDBatch`, `RowVersion` and `IDApplication` together. |
+
+Use this contract to scope the first read-only fixture test. The existing schema supplies user/profile and activity tables. It does not yet provide the application, area, process, status and batch contracts above. The Jet template is separate from the synthetic SQL Server master database.
+
 ## Current checkpoint
 
 The first session cloned the initially empty `Jani-konicoti/optimocore` repo into a separate sibling directory. It did not change the Dental Center Albania website.
