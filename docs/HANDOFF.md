@@ -1,4 +1,20 @@
-# Team handoff — 24 November 2026
+# Team handoff — 25 November 2026
+
+## 25 November checkpoint — native DataValidation document round trip passed
+
+Continues `54ca92d`. After manual sign-in, both apps were tested in `.local/runtime/document-test` against the same isolated `CoreReaDvFixture`. This accepts one synthetic, script-free document workflow, not every application feature or a production installation. The original EXEs remain unchanged; activation still uses the previously recorded isolated Utility probe, not a vendor-issued license.
+
+- DataValidation opened job `REA Validation Demo`, batch `1001`, displayed the synthetic TIFF and its editable REFERENCE field containing `ABCD`. Pressing Enter rejected it visibly: `Formato non corretto - Caratteri non consentiti in una o più posizioni`. Focus stayed in the field.
+- Replacing it with `1234` and pressing Enter accepted the value and offered `Chiudere la batch?`. Confirming Yes completed the save and close. An independent, fresh read of the server-side Jet file returned `1234` / Status `0`; SQL returned `DONE` with no user/station lock. Monitor's Ricerca displayed the same batch as `DONE`.
+- A completed batch is excluded from the normal DataValidation picker. For the reopen test, Monitor's supported `Batch > Cambia stato` control returned only synthetic batch `1001` from `DONE` to `PAUSED`. DataValidation's job picker then listed it. Opening it displayed the image and the persisted `1234`, confirming native reopening as well as independent file persistence.
+- Closed the reopened batch through `File > Chiudi`, confirmed Yes, and independently verified `1234` / Status `0`, unlocked `DONE` again. Monitor Ricerca was refreshed and displayed `DONE`. No direct SQL or Jet edits were used to simulate the application save or reopen.
+- `Test-DocumentFixture.ps1 -ExpectSaved` passed after both closes. The document SQL error capture reported zero errors. The readiness audit (including the compiled validator and disposable-copy writer) passed before native testing. `verify_checkpoint.py` again verified all 716 original input files unchanged and six method checks passed. Raw state/error reports remain ignored under `.local/evidence`.
+
+An early saved-state check failed while the close confirmation was still pending: server value remained ABCD and the batch was locked IN_VALIDATION. Targeting and confirming the actual dialog resolved it; the subsequent checks above passed. This was not repaired by changing stored values.
+
+Next priority: extend the synthetic fixture to two documents and exercise `File > Interrompi` / resume, navigation, and final completion. Keep this passing single-document case as a regression. Script execution and the separately observed scripting-engine identity mismatch remain unverified; use a separate case if scripts are needed. Agree on the next business workflow before claiming wider acceptance. The personal step-by-step guide remains local in ignored `docs/TESTING.md`.
+
+Suggested message to Henri: "DataValidation's synthetic document round trip passed: image opens, ABCD is rejected, 1234 saves and persists after reopen, and Monitor shows unlocked DONE. Reopen was tested by returning batch 1001 to PAUSED through Monitor, then closing it back to DONE. Next: two-document navigation and interrupt/resume. This uses the isolated probe runtime; vendor licensing and scripted fields remain separate."
 
 ## 25 November checkpoint — DataValidation document fixture and compiled-method checks
 
