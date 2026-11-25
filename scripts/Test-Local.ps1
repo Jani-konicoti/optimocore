@@ -17,6 +17,18 @@ try {
     $null = $command.Parameters.AddWithValue('@password', $credentials.app_password)
     if ([int]$command.ExecuteScalar() -ne 1) { throw 'Synthetic credential query failed' }
     $command.Dispose()
+    $command = $connection.CreateCommand()
+    $command.CommandText = @'
+SELECT u.UserName FROM dbo.Users u
+INNER JOIN dbo.UsersUsersProfilesMatch m ON u.IDUser=m.IDUser
+INNER JOIN dbo.UserProfiles p ON m.IDProfile=p.IDUserProfile
+WHERE u.Active=1 AND p.IDUserProfile=(SELECT IDUserProfile FROM dbo.UserProfiles WHERE Name=N'REA Synthetic Profile')
+AND u.UserName=@user;
+'@
+    $null = $command.Parameters.AddWithValue('@user', $credentials.app_user)
+    if ([string]$command.ExecuteScalar() -ne $credentials.app_user) { throw 'Monitor Sessions active-user lookup failed' }
+    $command.Dispose()
+    Write-Output 'PASS: Monitor Sessions active-user lookup returns the synthetic test user.'
     # Exercise the recovered column contracts without retaining fabricated events.
     $transaction = $connection.BeginTransaction()
     try {

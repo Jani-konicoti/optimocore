@@ -31,6 +31,9 @@ CREATE TABLE dbo.Users (
     Description nvarchar(255) NOT NULL DEFAULT N'',
     Power int NOT NULL DEFAULT 1
 );
+-- Monitor's Sessions user lookup filters the synthetic users by this flag.
+IF COL_LENGTH(N'dbo.Users', N'Active') IS NULL
+    ALTER TABLE dbo.Users ADD Active bit NOT NULL DEFAULT 1;
 GO
 -- Active-profile selection is a separate gate after credential validation.
 -- datetime is intentional: the recovered query uses VALIDITY_TO + 1.

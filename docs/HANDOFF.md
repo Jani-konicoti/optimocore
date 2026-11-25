@@ -1,5 +1,10 @@
 # Team handoff — 24 November 2026
 
+## 25 November checkpoint — Sessions user lookup
+
+- Monitor's Sessions dropdown query filters `dbo.Users.Active = 1` and joins the selected profile through `UsersUsersProfilesMatch`. The exact-build REA record `ev_1a5bb9feee2f07557d7e33118c607f7b1706649d68b5c82aaa006dfff5b08713` contains the SQL literal at `0x7001066c` (Monitor SHA-256 `ac86a5241b0fdd4f13e4584f44d66a8693b40f2d684f5541baca9fb9c9c102d4`, MVID `3f7e6564-3aac-4f67-ac54-6f8b82373506`). Added a guarded `Active` bit column with a default of `1` for synthetic users and applied it to the running loopback fixture.
+- `Initialize-Fixture.ps1` and `Test-Local.ps1` passed. The Sessions lookup returned the configured test user, and the batch SQL checks still pass. Monitor showed a login prompt when the UI test was attempted. After manual sign-in, open `Sessioni` and confirm that `Utente` contains the test user without a SQL error.
+
 ## 25 November checkpoint — Monitor batch list and ID filter passed
 
 - Monitor 3.4.9.73 showed 20 missing `Batches` columns when Search ran after the user signed in. Added those columns to the local synthetic fixture with guarded ALTER statements. Column types are fixture inferences. The SQL regression check now projects all 20 fields.
