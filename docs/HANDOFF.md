@@ -1,5 +1,11 @@
 # Team handoff — 24 November 2026
 
+## 25 November checkpoint — Sessions search passed in Monitor
+
+- Selected `rea_test` in `Sessioni` → `Utente` and ran `Cerca` for 25 November. Monitor reported `Invalid column name 'Line'`. The exact-build REA record `ev_1a5bb9feee2f07557d7e33118c607f7b1706649d68b5c82aaa006dfff5b08713` contains the Sessions projection from `Operations` at user-string token `0x70016050` for the Monitor SHA-256 and MVID recorded below.
+- Added a guarded `Operations.Line` column with an empty default in the local fixture. The SQL check inserts, searches and rolls back a synthetic session. Initialization and the existing checks passed.
+- Reran the same UI search. Monitor displayed two `MONITOR` sessions for `rea_test` totaling `00:12:00`, with no SQL error. The UI rows were existing test activity, separate from the rolled-back SQL check.
+
 ## 25 November checkpoint — Sessions dropdown passed in Monitor
 
 - After `Users.Active` was added, the live Sessions tab exposed two more missing objects: `UserProfiles.ImageHighlighter` and `dbo.Lines`. Added an inferred `bit` flag defaulting to `0` and the minimal `Lines` table with one synthetic line in the test area. The test user qualifies through the existing DataValidation profile flag.

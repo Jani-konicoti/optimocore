@@ -109,6 +109,9 @@ CREATE TABLE dbo.Operations (
     CharsDV int NOT NULL DEFAULT 0,
     TotalKeysDV int NOT NULL DEFAULT 0
 );
+-- Sessions search reads the line from each activity row.
+IF COL_LENGTH(N'dbo.Operations', N'Line') IS NULL
+    ALTER TABLE dbo.Operations ADD Line nvarchar(128) NOT NULL DEFAULT N'';
 GO
 
 -- Monitor batch-list fixture. The seeded process has no profile mapping.

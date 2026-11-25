@@ -53,9 +53,23 @@ INSERT INTO dbo.Operations
 VALUES(0,'',0,0,0,N'',N'',N'',N'Fixture contract check',N'',N'',N'',N'',GETDATE(),GETDATE(),GETDATE(),0,N'Transaction rolled back',0,0,0,0);
 '@
         $null = $command.ExecuteNonQuery()
+        $command.CommandText = @'
+INSERT INTO dbo.Operations (Activity, UserName, StartTime, EndTime, Line, ProcessName)
+VALUES (N'SESSIONE', @user, GETDATE(), GETDATE(), N'REA Test Line', N'Fixture contract check');
+SELECT ProcessName AS Processo, UserName AS Utente,
+       CONVERT(varchar(20), StartTime, 113) AS Inizio,
+       CONVERT(varchar(20), EndTime, 113) AS Fine, Line AS Linea, STR(Duration) AS Durata
+FROM dbo.Operations
+WHERE Activity=N'SESSIONE' AND CONVERT(date, StartTime)=CONVERT(date, GETDATE())
+AND UserName=@user AND Line=N'REA Test Line' AND ProcessName=N'Fixture contract check'
+ORDER BY StartTime;
+'@
+        $null = $command.Parameters.AddWithValue('@user', $credentials.app_user)
+        if ([string]$command.ExecuteScalar() -ne 'Fixture contract check') { throw 'Monitor Sessions search did not return the synthetic event' }
         $command.Dispose()
     } finally { $transaction.Rollback(); $transaction.Dispose() }
     Write-Output 'PASS: Monitor view-settings query and activity-log insert contracts; synthetic events rolled back.'
+    Write-Output 'PASS: Monitor Sessions search returns a matching synthetic event before rollback.'
     $manifest = Get-Content -LiteralPath (Join-Path $root 'fixture/permissions.json') -Raw | ConvertFrom-Json
     foreach ($application in @('MONITOR', 'DATAVALIDATION')) {
         $command = $connection.CreateCommand()
