@@ -1,5 +1,12 @@
 # Team handoff — 24 November 2026
 
+## 25 November checkpoint — Sessions CSV diagnosis and candidate
+
+- Baseline `Esporta in Csv` fails with a null reference and leaves a headers-only file. Exact-build Monitor REA record `ev_1a5bb9feee2f07557d7e33118c607f7b1706649d68b5c82aaa006dfff5b08713` shows the bindings: Sessions search `0x060004b8` passes a `DataTable` to the grid, CSV handler `0x060004ee` delegates to `EsportaGrigliaInCsv` (`0x060004eb`), and the shared exporter casts the data source to `DataView` before calling `ToTable()` without a null check. Its source-table loop does not consult row selection.
+- `Build-MonitorSessionsCsv.ps1` builds a separate loopback candidate under ignored `.local/runtime/monitor-sessions-csv`. Use Windows PowerShell 5.1 and the .NET Framework `lib/net40/Mono.Cecil.dll` from NuGet `Mono.Cecil` 0.11.6 under `.local/tools/mono-cecil-0.11.6/`. The script verifies dependency and baseline digests and checks the original Monitor MVID and method tokens before redirecting only the Sessions button to a selected-row exporter. The candidate directory is separate from the baseline and original package.
+- The candidate serializer regression passed for two detail rows (480 and 240 seconds), a null line, an escaped field and an ignored grid summary row. REA verified candidate handler `0x060004ee` now calls the replacement; candidate SHA-256 `296a097cc153a2551cba3e38ddb9c60fba462c5e7a25055aa01d4c91202c72ba`, MVID `3f7e6564-3aac-4f67-ac54-6f8b82373506`, record `ev_02e2ea121659d23492e059b3b41bb52d5884d83315aebf7aec9a701f520104ff`.
+- The native end-to-end retest awaits manual candidate sign-in. Monitor enforces a single instance, so the baseline must close first. On the candidate, search Sessions for `rea_test` on 25 November, select the rows beginning `11:32:50` and `11:43:44`, then export to a new filename and verify two detail records plus `00:12:00`. A separate fallback CSV under ignored `.local/evidence` was built from the verified SQL rows and independently parsed to confirm the count and total.
+
 ## 25 November checkpoint — Sessions search passed in Monitor
 
 - Selected `rea_test` in `Sessioni` → `Utente` and ran `Cerca` for 25 November. Monitor reported `Invalid column name 'Line'`. The exact-build REA record `ev_1a5bb9feee2f07557d7e33118c607f7b1706649d68b5c82aaa006dfff5b08713` contains the Sessions projection from `Operations` at user-string token `0x70016050` for the Monitor SHA-256 and MVID recorded below.
