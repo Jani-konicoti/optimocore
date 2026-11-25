@@ -66,10 +66,20 @@ ORDER BY StartTime;
 '@
         $null = $command.Parameters.AddWithValue('@user', $credentials.app_user)
         if ([string]$command.ExecuteScalar() -ne 'Fixture contract check') { throw 'Monitor Sessions search did not return the synthetic event' }
+        $command.CommandText = @'
+INSERT INTO dbo.Operations(IDBatch,Activity,UserName,Status)
+VALUES (N'REA-BATCH-001',N'CAMBIA PRIORITA',@user,N'Fixture contract check');
+SELECT COUNT(*) FROM dbo.ReaBatchPriorityHistory
+WHERE UserName=@user AND Status=N'Fixture contract check';
+'@
+        if ([int]$command.ExecuteScalar() -ne 1) { throw 'Monitor Storici view did not return the test audit event' }
+        $command.CommandText = "SELECT COUNT(*) FROM dbo.StoricoCustom WHERE IDArea=1 AND Name=N'REA Batch Priority Audit' AND StringConnection=N'' AND CustomQuery LIKE N'%dbo.ReaBatchPriorityHistory'"
+        if ([int]$command.ExecuteScalar() -ne 1) { throw 'Monitor Storici job definition is missing or uses another connection' }
         $command.Dispose()
     } finally { $transaction.Rollback(); $transaction.Dispose() }
     Write-Output 'PASS: Monitor view-settings query and activity-log insert contracts; synthetic events rolled back.'
     Write-Output 'PASS: Monitor Sessions search returns a matching synthetic event before rollback.'
+    Write-Output 'PASS: Monitor Storici job uses the local connection and its view exposes the priority audit event.'
     $manifest = Get-Content -LiteralPath (Join-Path $root 'fixture/permissions.json') -Raw | ConvertFrom-Json
     foreach ($application in @('MONITOR', 'DATAVALIDATION')) {
         $command = $connection.CreateCommand()

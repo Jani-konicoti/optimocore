@@ -1,5 +1,11 @@
 # Team handoff — 24 November 2026
 
+## 25 November checkpoint — Storici priority audit job
+
+- In Monitor, `Storici` → `Lavoro` was empty and `Cerca` was disabled. The exact-build REA record `ev_1a5bb9feee2f07557d7e33118c607f7b1706649d68b5c82aaa006dfff5b08713` shows that `DBCaricaComboApplicazioni` (`0x06000419`) lists regular jobs with a nonempty `ArchiveDB` and also supports area-scoped `StoricoCustom` jobs. The synthetic application has no archive or external job configuration. `DBCaricaComboCampiStoriciEsterni` (`0x06000415`) loads the custom query and falls back to the active SQL connection for an empty `StringConnection`.
+- Added the local `EXT_REA Batch Priority Audit` job using that fallback and a SELECT-only view over existing `dbo.Operations` rows. The view is restricted to synthetic batch `REA-BATCH-001` and action `CAMBIA PRIORITA`. It returned exactly the two existing `rea_test` audit actions. The audit records do not contain the old and new priority values. `Initialize-Fixture.ps1` and the expanded `Test-Local.ps1` passed.
+- The native UI retest awaits manual sign-in. Monitor was at its login prompt, and the job list is populated when the profile loads. In the signed-in session, open `Storici`, select `EXT_REA Batch Priority Audit`, click `Cerca`, and verify the two existing events.
+
 ## 25 November checkpoint — reversible Monitor batch priority change passed
 
 - In the isolated Monitor Sessions CSV candidate, loaded synthetic batch `REA-BATCH-001` from loopback `CoreReaFixture`. Used `Batch` → `Cambia priorità` to change priority from `0` to `1`. Refreshed via `Ricerca` and verified `1` in both the grid and an independent SQL read.

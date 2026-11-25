@@ -114,6 +114,25 @@ IF COL_LENGTH(N'dbo.Operations', N'Line') IS NULL
     ALTER TABLE dbo.Operations ADD Line nvarchar(128) NOT NULL DEFAULT N'';
 GO
 
+-- Storici can list a local custom query alongside jobs with configured archives.
+CREATE OR ALTER VIEW dbo.ReaBatchPriorityHistory AS
+SELECT IDBatch, Activity, UserName, TimeStampOp, Status
+FROM dbo.Operations
+WHERE IDBatch=N'REA-BATCH-001' AND Activity=N'CAMBIA PRIORITA';
+GO
+IF OBJECT_ID(N'dbo.StoricoCustom', N'U') IS NULL
+CREATE TABLE dbo.StoricoCustom (
+    IDArea int NOT NULL,
+    Name nvarchar(128) NOT NULL,
+    StringConnection nvarchar(512) NOT NULL DEFAULT N'',
+    CustomQuery nvarchar(max) NOT NULL,
+    PRIMARY KEY (IDArea, Name)
+);
+IF NOT EXISTS (SELECT 1 FROM dbo.StoricoCustom WHERE IDArea=1 AND Name=N'REA Batch Priority Audit')
+    INSERT dbo.StoricoCustom(IDArea,Name,CustomQuery)
+    VALUES (1,N'REA Batch Priority Audit',N'SELECT IDBatch, Activity, UserName, TimeStampOp, Status FROM dbo.ReaBatchPriorityHistory');
+GO
+
 -- Monitor batch-list fixture. The seeded process has no profile mapping.
 IF OBJECT_ID(N'dbo.Areas', N'U') IS NULL
 CREATE TABLE dbo.Areas (IDArea int NOT NULL PRIMARY KEY);
