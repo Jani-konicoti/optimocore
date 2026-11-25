@@ -1,5 +1,12 @@
 # Team handoff — 24 November 2026
 
+## 25 November checkpoint — restored Monitor fixture
+
+- Started Docker Desktop, pulled the pinned SQL Server image, and initialized a fresh synthetic volume. The previous fixture volume and local credentials were absent. SQL Server listens on `127.0.0.1:14333`. The tracked permission manifest was reused with hash-verified executable builds.
+- Added the inferred Monitor list tables and seeded `REA-BATCH-001` in one active synthetic application. The process reference has no profile mapping, so it is unavailable from the manual process menu. The schema is scoped to listing and filtering. `Fields` and document workflows are still open.
+- `Initialize-Fixture.ps1` and `Test-Local.ps1` passed. They verified the synthetic credentials, active profile, settings/activity contracts, batch listing and positive/negative ID filters at the SQL layer. The isolated Monitor copy retained the recorded executable and Utility hashes. Its configuration check confirmed loopback SQL, disabled optional SQL connections, and a loopback web-service endpoint.
+- The isolated copy is `.local/runtime/fixture-baseline/Monitor.exe`. A launch was requested but no Monitor window was observed. Manual login with the generated credentials is required before UI acceptance. Once signed in, verify the list shows `REA-BATCH-001`, then apply a matching ID and a nonmatching ID and record the displayed results.
+
 ## 25 November checkpoint — supplied Core scan and Monitor batch-list trace
 
 - Inventoried all 83 supplied top-level files. REA inspected 49 PE files: 45 assemblies had complete managed metadata coverage, and four native 32-bit GdPicture components had complete PE import-table coverage. The other 34 files were checked with local read-only tools for XML parsing, text readability, or binary headers. The scan did not execute any target or interpret file contents as instructions. Per-file hashes and scan references are under ignored `.local/evidence/core-supplied-scan-2026-11-25.json`.

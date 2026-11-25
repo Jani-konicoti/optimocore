@@ -18,6 +18,8 @@ powershell -NoProfile -File scripts/Initialize-Fixture.ps1
 python scripts/prepare_fixture_runtime.py
 ```
 
+For the verified builds in the evidence index, `python scripts/prepare_fixture.py --reuse-permissions` generates local credentials from the checked-in permission manifest. If you have the supplied extracted Core folder, `python scripts/prepare_fixture_runtime.py --baseline-only --core 'C:\path\to\Core'` checks the indexed binary hashes and prepares the original copies for use with the loopback fixture. Use `scripts/Test-Local.ps1` to check the synthetic user, profile and SQL listing/filtering of `REA-BATCH-001` before testing Monitor in the UI.
+
 Initialize-Fixture.ps1 seeds only the hard-coded loopback CoreReaFixture database, syncs the current local test user's password, and links that user to the synthetic profile. It is repeatable and updates fixture configuration defaults without deleting the database. Configuration Boolean values must be `True`/`False` for paths using `Convert.ToBoolean(string)`; numeric `1` caused a startup exception in the first trial and was corrected. Profile and membership validity columns intentionally use datetime, which supports the recovered query's `Validity_To + 1` expression.
 
 Application copies are under `.local/runtime/fixture-baseline` and `.local/runtime/fixture-candidate`. The latter includes the generated Utility.dll license probe. Both keep the original DataValidation.exe unchanged and point at the same database. Third-party SOAP config is loopback, optional connection slots are empty, and Oracle/NetPC flags retain their expected `N` format.

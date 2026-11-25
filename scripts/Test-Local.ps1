@@ -60,7 +60,33 @@ VALUES(0,'',0,0,0,N'',N'',N'',N'Fixture contract check',N'',N'',N'',N'',GETDATE(
     $reader.Dispose(); $command.Dispose()
     $needed = @('UserProfiles', 'UsersUsersProfilesMatch', 'Customview', 'Operations', 'Applications', 'Process', 'Batches', 'Fields')
     $missing = @($needed | Where-Object { $_ -notin $tables })
-    $report = @{ database_connection = 'passed'; synthetic_credential_query = 'passed'; monitor_active_profile_query = 'passed'; datavalidation_active_profile_query = 'passed'; view_settings_query = 'passed'; operation_insert_contracts = 'passed_rolled_back'; profile_permission_columns = $manifest.profile_permissions.Count; tables_present = $tables; workflow_tables_missing = $missing; scope = 'SQL credential/profile/view checks and rolled-back activity inserts; does not submit application login' }
+    $batchCheck = 'fixture_tables_missing'
+    if ('Batches' -in $tables -and 'Applications' -in $tables) {
+        $command = $connection.CreateCommand()
+        $command.CommandText = @'
+SELECT IDBatch, RowVersion, IDApplication FROM dbo.Batches WITH (NOLOCK)
+WHERE IDApplication IN (SELECT IDApplication FROM dbo.Applications WHERE Active=1)
+AND Status NOT IN (N'NASCOSTO',N'NASCOSTO WEB',N'NASCOSTO (S)')
+AND IDBatch LIKE @filter;
+'@
+        $filter = $command.Parameters.Add('@filter', [System.Data.SqlDbType]::NVarChar, 128)
+        foreach ($case in @(@{ pattern = '%'; expected = 1 }, @{ pattern = '%REA-BATCH-001%'; expected = 1 }, @{ pattern = '%MISSING-REA-BATCH%'; expected = 0 })) {
+            $filter.Value = $case.pattern
+            $reader = $command.ExecuteReader()
+            try {
+                $matches = 0
+                while ($reader.Read()) {
+                    if ($reader.GetString(0) -eq 'REA-BATCH-001' -and $reader.GetInt32(2) -eq 1 -and $reader.GetValue(1).Length -eq 8) { $matches++ }
+                    elseif ($case.expected -eq 0) { throw 'Unexpected row for the negative Monitor batch filter' }
+                }
+                if ($matches -ne $case.expected) { throw "Monitor batch query failed for $($case.pattern)" }
+            } finally { $reader.Dispose() }
+        }
+        $command.Dispose()
+        $batchCheck = 'passed'
+        Write-Output 'PASS: SQL batch listing and matching/nonmatching ID filters for REA-BATCH-001.'
+    }
+    $report = @{ database_connection = 'passed'; synthetic_credential_query = 'passed'; monitor_active_profile_query = 'passed'; datavalidation_active_profile_query = 'passed'; view_settings_query = 'passed'; operation_insert_contracts = 'passed_rolled_back'; monitor_batch_sql = $batchCheck; profile_permission_columns = $manifest.profile_permissions.Count; tables_present = $tables; workflow_tables_missing = $missing; scope = 'SQL checks only; application login and filtering are separate observations' }
     $report | ConvertTo-Json -Depth 4 | Set-Content -Encoding UTF8 (Join-Path $root '.local/evidence/local-health.json')
     Write-Output 'PASS: local SQL database connects; synthetic test credentials match.'
     Write-Output ('Tables present: ' + ($tables -join ', '))

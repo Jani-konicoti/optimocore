@@ -1,4 +1,5 @@
 """Generate local fixture credentials and a source-derived permission manifest."""
+import argparse
 import json
 import re
 import secrets
@@ -7,6 +8,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--reuse-permissions', action='store_true',
+                        help='Use the checked-in permission manifest for the documented builds')
+    args = parser.parse_args()
+    if args.reuse_permissions:
+        manifest = json.loads((ROOT / 'fixture/permissions.json').read_text(encoding='utf-8'))
+        if not manifest.get('permissions') or not manifest.get('profile_permissions'):
+            raise ValueError('The checked-in permission manifest is incomplete')
     local = ROOT / ".local/fixture"
     local.mkdir(parents=True, exist_ok=True)
     credentials = local / "credentials.json"
@@ -15,6 +24,9 @@ def main():
                                            "app_user": "rea_test", "app_password": secrets.token_urlsafe(18)}, indent=2), encoding="utf-8")
     data = json.loads(credentials.read_text(encoding="utf-8"))
     (ROOT / ".local/fixture.env").write_text("CORE_REA_SA_PASSWORD=" + data["sa_password"] + "\n", encoding="utf-8")
+    if args.reuse_permissions:
+        print('Prepared local-only credentials using the checked-in permission manifest.')
+        return
     permissions = set()
     profile_permissions = set()
     for target in ["DataValidation", "Monitor"]:

@@ -104,3 +104,91 @@ CREATE TABLE dbo.Operations (
     TotalKeysDV int NOT NULL DEFAULT 0
 );
 GO
+
+-- Monitor batch-list fixture. The seeded process has no profile mapping.
+IF OBJECT_ID(N'dbo.Areas', N'U') IS NULL
+CREATE TABLE dbo.Areas (IDArea int NOT NULL PRIMARY KEY);
+IF OBJECT_ID(N'dbo.Applications', N'U') IS NULL
+CREATE TABLE dbo.Applications (
+    IDApplication int NOT NULL PRIMARY KEY,
+    IDArea int NOT NULL REFERENCES dbo.Areas(IDArea),
+    Active bit NOT NULL,
+    Name nvarchar(128) NOT NULL,
+    Description nvarchar(255) NOT NULL,
+    Customer nvarchar(128) NOT NULL,
+    WorkPath nvarchar(255) NOT NULL DEFAULT N'',
+    OutPutPath nvarchar(255) NOT NULL DEFAULT N'',
+    ExportProcess nvarchar(128) NOT NULL DEFAULT N'',
+    InvoiceCountProcess nvarchar(128) NOT NULL DEFAULT N'',
+    ArchiveDB nvarchar(255) NOT NULL DEFAULT N'',
+    OnlyDataEntry bit NOT NULL DEFAULT 0,
+    Parameters nvarchar(max) NOT NULL DEFAULT N''
+);
+IF OBJECT_ID(N'dbo.AreasApplicationsMatch', N'U') IS NULL
+CREATE TABLE dbo.AreasApplicationsMatch (
+    IDArea int NOT NULL REFERENCES dbo.Areas(IDArea),
+    IDApplication int NOT NULL REFERENCES dbo.Applications(IDApplication),
+    PRIMARY KEY (IDArea, IDApplication)
+);
+IF OBJECT_ID(N'dbo.Process', N'U') IS NULL
+CREATE TABLE dbo.Process (
+    IDProcess int NOT NULL PRIMARY KEY,
+    IDApplication int NOT NULL REFERENCES dbo.Applications(IDApplication),
+    ProcessName nvarchar(128) NOT NULL,
+    Description nvarchar(255) NOT NULL,
+    ProcessType nvarchar(40) NOT NULL
+);
+IF OBJECT_ID(N'dbo.UserProfilesProcessMatch', N'U') IS NULL
+CREATE TABLE dbo.UserProfilesProcessMatch (
+    IDUserProfile int NOT NULL REFERENCES dbo.UserProfiles(IDUserProfile),
+    IDProcess int NOT NULL REFERENCES dbo.Process(IDProcess),
+    PRIMARY KEY (IDUserProfile, IDProcess)
+);
+IF OBJECT_ID(N'dbo.Status', N'U') IS NULL
+CREATE TABLE dbo.Status (
+    IDApplication int NOT NULL REFERENCES dbo.Applications(IDApplication),
+    Name nvarchar(128) NOT NULL,
+    MinPower smallint NOT NULL DEFAULT 0,
+    Color int NOT NULL DEFAULT 0,
+    PRIMARY KEY (IDApplication, Name)
+);
+IF OBJECT_ID(N'dbo.Batches', N'U') IS NULL
+CREATE TABLE dbo.Batches (
+    IDBatch nvarchar(128) NOT NULL PRIMARY KEY,
+    IDApplication int NOT NULL REFERENCES dbo.Applications(IDApplication),
+    Customer nvarchar(128) NOT NULL,
+    Job nvarchar(128) NOT NULL,
+    Name nvarchar(128) NOT NULL,
+    NDoc int NOT NULL DEFAULT 0,
+    NPag int NOT NULL DEFAULT 0,
+    NImg int NOT NULL DEFAULT 0,
+    Status nvarchar(128) NOT NULL,
+    Priority int NOT NULL DEFAULT 0,
+    LockUser nvarchar(128) NOT NULL DEFAULT N'',
+    LockStation nvarchar(128) NOT NULL DEFAULT N'',
+    InsDate datetime NOT NULL DEFAULT GETDATE(),
+    InsUser nvarchar(128) NOT NULL DEFAULT N'',
+    InsStation nvarchar(128) NOT NULL DEFAULT N'',
+    Path nvarchar(255) NOT NULL DEFAULT N'',
+    Note nvarchar(255) NOT NULL DEFAULT N'',
+    Message nvarchar(255) NOT NULL DEFAULT N'',
+    DestLine nvarchar(128) NOT NULL DEFAULT N'',
+    RowVersion rowversion NOT NULL
+);
+GO
+IF NOT EXISTS (SELECT 1 FROM dbo.Areas WHERE IDArea=1)
+    INSERT dbo.Areas(IDArea) VALUES (1);
+IF NOT EXISTS (SELECT 1 FROM dbo.Applications WHERE IDApplication=1)
+    INSERT dbo.Applications(IDApplication,IDArea,Active,Name,Description,Customer)
+    VALUES (1,1,1,N'REA Monitor',N'Synthetic Monitor application',N'REA Synthetic Customer');
+IF NOT EXISTS (SELECT 1 FROM dbo.AreasApplicationsMatch WHERE IDArea=1 AND IDApplication=1)
+    INSERT dbo.AreasApplicationsMatch(IDArea,IDApplication) VALUES (1,1);
+IF NOT EXISTS (SELECT 1 FROM dbo.Process WHERE IDProcess=1)
+    INSERT dbo.Process(IDProcess,IDApplication,ProcessName,Description,ProcessType)
+    VALUES (1,1,N'REA Batch List',N'Synthetic process reference',N'Fixture');
+IF NOT EXISTS (SELECT 1 FROM dbo.Status WHERE IDApplication=1 AND Name=N'READY')
+    INSERT dbo.Status(IDApplication,Name) VALUES (1,N'READY');
+IF NOT EXISTS (SELECT 1 FROM dbo.Batches WHERE IDBatch=N'REA-BATCH-001')
+    INSERT dbo.Batches(IDBatch,IDApplication,Customer,Job,Name,Status,Note)
+    VALUES (N'REA-BATCH-001',1,N'REA Synthetic Customer',N'REA Job',N'REA Test Batch',N'READY',N'Synthetic list and filter test');
+GO
