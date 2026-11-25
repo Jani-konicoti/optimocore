@@ -258,13 +258,21 @@ IF NOT EXISTS (SELECT 1 FROM dbo.Areas WHERE IDArea=1)
 IF NOT EXISTS (SELECT 1 FROM dbo.Lines WHERE IDArea=1 AND Description=N'REA Test Line')
     INSERT dbo.Lines(IDArea,Description) VALUES (1,N'REA Test Line');
 IF NOT EXISTS (SELECT 1 FROM dbo.Applications WHERE IDApplication=1)
+BEGIN
+    IF COLUMNPROPERTY(OBJECT_ID('dbo.Applications'),'IDApplication','IsIdentity')=1 SET IDENTITY_INSERT dbo.Applications ON;
     INSERT dbo.Applications(IDApplication,IDArea,Active,Name,Description,Customer)
     VALUES (1,1,1,N'REA Monitor',N'Synthetic Monitor application',N'REA Synthetic Customer');
+    IF COLUMNPROPERTY(OBJECT_ID('dbo.Applications'),'IDApplication','IsIdentity')=1 SET IDENTITY_INSERT dbo.Applications OFF;
+END;
 IF NOT EXISTS (SELECT 1 FROM dbo.AreasApplicationsMatch WHERE IDArea=1 AND IDApplication=1)
     INSERT dbo.AreasApplicationsMatch(IDArea,IDApplication) VALUES (1,1);
 IF NOT EXISTS (SELECT 1 FROM dbo.Process WHERE IDProcess=1)
+BEGIN
+    IF COLUMNPROPERTY(OBJECT_ID('dbo.Process'),'IDProcess','IsIdentity')=1 SET IDENTITY_INSERT dbo.Process ON;
     INSERT dbo.Process(IDProcess,IDApplication,ProcessName,Description,ProcessType)
     VALUES (1,1,N'REA Batch List',N'Synthetic process reference',N'Fixture');
+    IF COLUMNPROPERTY(OBJECT_ID('dbo.Process'),'IDProcess','IsIdentity')=1 SET IDENTITY_INSERT dbo.Process OFF;
+END;
 IF NOT EXISTS (SELECT 1 FROM dbo.Status WHERE IDApplication=1 AND Name=N'READY')
     INSERT dbo.Status(IDApplication,Name) VALUES (1,N'READY');
 IF NOT EXISTS (SELECT 1 FROM dbo.Batches WHERE IDBatch=N'REA-BATCH-001')

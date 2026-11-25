@@ -11,7 +11,7 @@ $builder['Encrypt'] = $false
 $connection = New-Object System.Data.SqlClient.SqlConnection $builder.ConnectionString
 $connection.Open()
 try {
-    foreach ($schemaFile in @('fixture/schema.sql', 'fixture/workspace.sql')) {
+    foreach ($schemaFile in @('fixture/schema.sql', 'fixture/compatibility.sql', 'fixture/workspace.sql')) {
     $sql = Get-Content -LiteralPath (Join-Path $root $schemaFile) -Raw
     foreach ($batch in ($sql -split '(?im)^GO\s*$')) {
         if ($batch.Trim()) { $command = $connection.CreateCommand(); $command.CommandText = $batch; $command.CommandTimeout = 60; $null = $command.ExecuteNonQuery(); $command.Dispose() }

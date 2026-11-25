@@ -19,11 +19,29 @@ try {
     $command.Transaction = $transaction
     $command.CommandText = @'
 DECLARE @profile int=(SELECT IDUserProfile FROM dbo.UserProfiles WHERE Name=N'REA Synthetic Profile');
-INSERT dbo.Applications(Name,Customer,Description) VALUES(N'REA contract test',N'REA fixture',N'Rolled back');
-DECLARE @app int=SCOPE_IDENTITY();
+DECLARE @app int;
+IF COLUMNPROPERTY(OBJECT_ID('dbo.Applications'),'IDApplication','IsIdentity')=1
+BEGIN
+ INSERT dbo.Applications(IDArea,Active,Name,Customer,Description) VALUES(1,1,N'REA contract test',N'REA fixture',N'Rolled back');
+ SET @app=SCOPE_IDENTITY();
+END
+ELSE
+BEGIN
+ SELECT @app=ISNULL(MAX(IDApplication),0)+1 FROM dbo.Applications;
+ INSERT dbo.Applications(IDApplication,IDArea,Active,Name,Customer,Description) VALUES(@app,1,1,N'REA contract test',N'REA fixture',N'Rolled back');
+END;
 INSERT dbo.AreasApplicationsMatch(IDArea,IDApplication) VALUES(1,@app);
-INSERT dbo.Process(IDApplication,ProcessName,[Start],EndInt) VALUES(@app,N'REA Validation',N'REA READY',N'REA PAUSED');
-DECLARE @process int=SCOPE_IDENTITY();
+DECLARE @process int;
+IF COLUMNPROPERTY(OBJECT_ID('dbo.Process'),'IDProcess','IsIdentity')=1
+BEGIN
+ INSERT dbo.Process(IDApplication,ProcessName,Description,ProcessType,[Start],EndInt) VALUES(@app,N'REA Validation',N'Rolled back',N'Manuale',N'REA READY',N'REA PAUSED');
+ SET @process=SCOPE_IDENTITY();
+END
+ELSE
+BEGIN
+ SELECT @process=ISNULL(MAX(IDProcess),0)+1 FROM dbo.Process;
+ INSERT dbo.Process(IDProcess,IDApplication,ProcessName,Description,ProcessType,[Start],EndInt) VALUES(@process,@app,N'REA Validation',N'Rolled back',N'Manuale',N'REA READY',N'REA PAUSED');
+END;
 INSERT dbo.UserProfilesProcessMatch(IDUserProfile,IDProcess) VALUES(@profile,@process);
 INSERT dbo.Status(IDApplication,Name) VALUES(@app,N'REA READY');
 INSERT dbo.Parameters(IDApplication,Name,Value) VALUES(@app,N'REA contract',N'True');

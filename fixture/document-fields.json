@@ -1,0 +1,8 @@
+{
+  "scope": "Inferred field contract for one synthetic document, from DataValidation 3.4.9.76 and FourService.Script.ScriptGenerator; not the vendor schema",
+  "source_sha256": "bd73afb20d1fe70a393d52774628fcaab8bef8ec22ecd96760bf2c05dbca11c0",
+  "booleans": ["AutoConfirm", "BatchField", "DocField", "FDuplicated", "FEnabled", "Focused", "FRequired", "FUniqueValue", "FVisible", "FWarningIfDifferent", "Uppercase"],
+  "integers": ["Decimals", "DefaultStatus", "FixedLength", "Formw", "Formx", "Formy", "ImageRegionH", "ImageRegionW", "ImageRegionX", "ImageRegionY", "MaxLength", "Page"],
+  "strings": ["CharType", "DecimalSeparator", "DefaultValue", "Description", "FAlignment", "Label", "List", "OnCheck", "Picture", "PostProc", "PreProc", "Source"],
+  "binary": ["CompiledScript"]
+}

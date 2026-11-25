@@ -1,10 +1,12 @@
-param([ValidateSet('Start','Read','Stop','Probe')][string]$Mode='Read')
+param([ValidateSet('Start','Read','Stop','Probe')][string]$Mode='Read', [ValidateSet('CoreReaFixture','CoreReaDvFixture')][string]$Database='CoreReaFixture')
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $PSScriptRoot
 $credentials=Get-Content -LiteralPath (Join-Path $root '.local/fixture/credentials.json') -Raw | ConvertFrom-Json
 $builder=New-Object System.Data.SqlClient.SqlConnectionStringBuilder
 $builder['Data Source']='127.0.0.1,14333'
-$builder['Initial Catalog']='CoreReaFixture'
+$builder['Initial Catalog']=$Database
+$session=if($Database -eq 'CoreReaDvFixture') {'CoreReaDocumentErrors'} else {'CoreReaFixtureErrors'}
+$reportName=if($Database -eq 'CoreReaDvFixture') {'document-sql-errors.json'} else {'sql-errors.json'}
 $builder['User ID']='sa'
 $builder['Password']=$credentials.sa_password
 $builder['Connect Timeout']=3
@@ -29,10 +31,12 @@ BEGIN
  ALTER EVENT SESSION CoreReaFixtureErrors ON SERVER STATE=START;
 END;
 '@
+        $command.CommandText=$command.CommandText.Replace('CoreReaFixtureErrors',$session).Replace("DB_ID(N'CoreReaFixture')","DB_ID(N'$Database')")
         $null=$command.ExecuteNonQuery()
         Write-Output 'Started project SQL error capture; query text and passwords are excluded.'
     } elseif($Mode -eq 'Stop') {
         $command.CommandText="IF EXISTS(SELECT 1 FROM sys.dm_xe_sessions WHERE name=N'CoreReaFixtureErrors') ALTER EVENT SESSION CoreReaFixtureErrors ON SERVER STATE=STOP; IF EXISTS(SELECT 1 FROM sys.server_event_sessions WHERE name=N'CoreReaFixtureErrors') DROP EVENT SESSION CoreReaFixtureErrors ON SERVER;"
+        $command.CommandText=$command.CommandText.Replace('CoreReaFixtureErrors',$session)
         $null=$command.ExecuteNonQuery()
         Write-Output 'Removed project SQL error capture.'
     } elseif($Mode -eq 'Probe') {
@@ -43,6 +47,7 @@ END;
         for($attempt=0;$attempt -lt 10 -and -not $found;$attempt++) {
             Start-Sleep -Milliseconds 500
             $command.CommandText="SELECT CAST(t.target_data AS nvarchar(max)) FROM sys.dm_xe_sessions s INNER JOIN sys.dm_xe_session_targets t ON s.address=t.event_session_address WHERE s.name=N'CoreReaFixtureErrors' AND t.target_name=N'ring_buffer'"
+            $command.CommandText=$command.CommandText.Replace('CoreReaFixtureErrors',$session)
             $raw=$command.ExecuteScalar()
             $found=($raw -is [string] -and $raw.Contains('__REA_ErrorCaptureProbe_Missing__'))
         }
@@ -50,6 +55,7 @@ END;
         Write-Output 'PASS: project SQL error capture detected a deliberate missing-object error; this marked probe is excluded from application-error reports.'
     } else {
         $command.CommandText="SELECT CAST(t.target_data AS xml) FROM sys.dm_xe_sessions s INNER JOIN sys.dm_xe_session_targets t ON s.address=t.event_session_address WHERE s.name=N'CoreReaFixtureErrors' AND t.target_name=N'ring_buffer'"
+        $command.CommandText=$command.CommandText.Replace('CoreReaFixtureErrors',$session)
         $raw=$command.ExecuteScalar()
         if(-not $raw -or $raw -is [DBNull]) {throw 'Project error capture is not running'}
         [xml]$events=$raw.ToString()
@@ -58,7 +64,7 @@ END;
             @{timestamp=$event.timestamp; number=$event.SelectSingleNode("data[@name='error_number']/value").InnerText; message=$event.SelectSingleNode("data[@name='message']/value").InnerText; application=$event.SelectSingleNode("action[@name='client_app_name']/value").InnerText}
         })
         # Raw messages stay ignored; user identifiers could appear in errors.
-        @{errors=$errors; count=$errors.Count; scope='SQL errors since project capture started; no application UI exception coverage'} | ConvertTo-Json -Depth 5 | Set-Content -Encoding UTF8 (Join-Path $root '.local/evidence/sql-errors.json')
+        @{errors=$errors; count=$errors.Count; scope='SQL errors since project capture started; no application UI exception coverage'} | ConvertTo-Json -Depth 5 | Set-Content -Encoding UTF8 (Join-Path $root ('.local/evidence/'+$reportName))
         Write-Output "Captured $($errors.Count) local database errors; details retained only in ignored evidence."
         foreach($errorEvent in $errors) {Write-Output "SQL error $($errorEvent.number)"}
     }

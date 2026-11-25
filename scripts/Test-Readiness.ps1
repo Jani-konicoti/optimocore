@@ -1,3 +1,4 @@
+param([switch]$IncludeDocument)
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $PSScriptRoot
 $checks=@(
@@ -6,6 +7,13 @@ $checks=@(
     @{name='compiled_database_library'; script='Test-DatabaseLibrary.ps1'; x86=$true},
     @{name='document_template'; script='Test-JetTemplate.ps1'; x86=$true}
 )
+if($IncludeDocument) {
+    $checks+=@(
+        @{name='compiled_document_validator_and_jet_checker'; script='Test-DocumentMethods.ps1'; x86=$true},
+        @{name='document_fixture_state'; script='Test-DocumentFixture.ps1'; x86=$true},
+        @{name='compiled_document_writer_roundtrip_on_copy'; script='Test-DocumentWriter.ps1'; x86=$true}
+    )
+}
 $results=@()
 foreach($check in $checks) {
     $hostPath=if($check.x86) {Join-Path $env:WINDIR 'SysWOW64/WindowsPowerShell/v1.0/powershell.exe'} else {Join-Path $env:WINDIR 'System32/WindowsPowerShell/v1.0/powershell.exe'}
@@ -17,7 +25,7 @@ $report=@{
     automated_checks=$results
     automated_checks_passed=(@($results | Where-Object {-not $_.passed}).Count -eq 0)
     ui_login='not_exercised_by_this_script_see_separate_UI_observations'
-    document_workflow='not_configured_or_accepted'
+    document_workflow=if($IncludeDocument) {'fixture_and_methods_checked_native_acceptance_is_separate'} else {'not_exercised_by_this_script'}
     scope='Local setup and recovered startup/list contracts only; does not certify all application features'
 }
 $report | ConvertTo-Json -Depth 5 | Set-Content -Encoding UTF8 (Join-Path $root '.local/evidence/readiness.json')
