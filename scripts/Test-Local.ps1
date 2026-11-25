@@ -103,6 +103,12 @@ WHERE UserName=@user AND Status=N'Fixture contract check';
     $tables = @()
     while ($reader.Read()) { $tables += $reader.GetString(0) }
     $reader.Dispose(); $command.Dispose()
+    $command = $connection.CreateCommand()
+    $command.CommandText = 'SELECT (SELECT COUNT(*) FROM dbo.Applications),(SELECT COUNT(*) FROM dbo.Batches),(SELECT COUNT(*) FROM dbo.Fields)'
+    $reader = $command.ExecuteReader()
+    $null = $reader.Read()
+    $definitions = @{ applications = $reader.GetInt32(0); batches = $reader.GetInt32(1); fields = $reader.GetInt32(2) }
+    $reader.Dispose(); $command.Dispose()
     $needed = @('UserProfiles', 'UsersUsersProfilesMatch', 'Customview', 'Operations', 'Applications', 'Process', 'Batches', 'Fields')
     $missing = @($needed | Where-Object { $_ -notin $tables })
     $batchCheck = 'fixture_tables_missing'
@@ -139,5 +145,6 @@ AND IDBatch LIKE @filter;
     $report | ConvertTo-Json -Depth 4 | Set-Content -Encoding UTF8 (Join-Path $root '.local/evidence/local-health.json')
     Write-Output 'PASS: local SQL database connects; synthetic test credentials match.'
     Write-Output ('Tables present: ' + ($tables -join ', '))
-    Write-Output ('Workflow tables still missing: ' + ($missing -join ', '))
+    Write-Output ('Document-workflow tables still missing: ' + ($missing -join ', '))
+    Write-Output "Workflow definitions: $($definitions.applications) applications, $($definitions.batches) batches, $($definitions.fields) fields. Table existence does not establish workflow readiness."
 } finally { $connection.Dispose() }

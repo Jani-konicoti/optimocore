@@ -69,7 +69,88 @@ REA evidence `ev_1a5bb9feee2f07557d7e33118c607f7b1706649d68b5c82aaa006dfff5b0871
 
 Use this contract to scope the first read-only fixture test. The existing schema supplies user/profile and activity tables. It does not yet provide the application, area, process, status and batch contracts above. The Jet template is separate from the synthetic SQL Server master database.
 
-## Current checkpoint
+## 25 November checkpoint — Storici priority audit job
+
+- In Monitor, `Storici` → `Lavoro` was empty and `Cerca` was disabled. The exact-build REA record `ev_1a5bb9feee2f07557d7e33118c607f7b1706649d68b5c82aaa006dfff5b08713` shows that `DBCaricaComboApplicazioni` (`0x06000419`) lists regular jobs with a nonempty `ArchiveDB` and also supports area-scoped `StoricoCustom` jobs. The synthetic application has no archive or external job configuration. `DBCaricaComboCampiStoriciEsterni` (`0x06000415`) loads the custom query and falls back to the active SQL connection for an empty `StringConnection`.
+- Added the local `EXT_REA Batch Priority Audit` job using that fallback and a SELECT-only view over existing `dbo.Operations` rows. The view is restricted to synthetic batch `REA-BATCH-001` and action `CAMBIA PRIORITA`. It returned exactly the two existing `rea_test` audit actions. The audit records do not contain the old and new priority values. `Initialize-Fixture.ps1` and the expanded `Test-Local.ps1` passed.
+- Native UI retest passed after manual sign-in. `Storici` → `EXT_REA Batch Priority Audit` → `Cerca` showed `Trovati 2`. Both rows displayed `REA-BATCH-001`, `CAMBIA PRIORITA`, and `rea_test`, with the recorded times shown as 11:10 and 11:11 on 25 November. No SQL error appeared.
+- `Storici` → `Esporta in CSV` succeeded in the existing candidate. The saved CSV contained exactly the two audit entries for `REA-BATCH-001` by `rea_test`, with source timestamps 11:10:22 and 11:11:09. The export is ignored under `.local/evidence/monitor-storici-rea-batch-001-2026-11-25.csv`, SHA-256 `43899bea351da462eb90696cde8df36e462a130587e0b5f24747bb8bc585e48a`. No additional candidate patch was needed.
+
+## 25 November checkpoint — reversible Monitor batch priority change passed
+
+- In the isolated Monitor Sessions CSV candidate, loaded synthetic batch `REA-BATCH-001` from loopback `CoreReaFixture`. Used `Batch` → `Cambia priorità` to change priority from `0` to `1`. Refreshed via `Ricerca` and verified `1` in both the grid and an independent SQL read.
+- Restored priority to `0` through the same Monitor control, refreshed, and verified `0` in the grid and SQL. Status remained `READY`. SQL row versions advanced on the two saves. This accepts the priority-change round trip only.
+
+## 25 November checkpoint — Sessions CSV diagnosis and candidate
+
+- Baseline `Esporta in Csv` fails with a null reference and leaves a headers-only file. Exact-build Monitor REA record `ev_1a5bb9feee2f07557d7e33118c607f7b1706649d68b5c82aaa006dfff5b08713` shows the bindings: Sessions search `0x060004b8` passes a `DataTable` to the grid, CSV handler `0x060004ee` delegates to `EsportaGrigliaInCsv` (`0x060004eb`), and the shared exporter casts the data source to `DataView` before calling `ToTable()` without a null check. Its source-table loop does not consult row selection.
+- `Build-MonitorSessionsCsv.ps1` builds a separate loopback candidate under ignored `.local/runtime/monitor-sessions-csv`. Use Windows PowerShell 5.1 and the .NET Framework `lib/net40/Mono.Cecil.dll` from NuGet `Mono.Cecil` 0.11.6 under `.local/tools/mono-cecil-0.11.6/`. The script verifies dependency and baseline digests and checks the original Monitor MVID and method tokens before redirecting only the Sessions button to a selected-row exporter. The candidate directory is separate from the baseline and original package.
+- The candidate serializer regression passed for two detail rows (480 and 240 seconds), a null line, an escaped field and an ignored grid summary row. REA verified candidate handler `0x060004ee` now calls the replacement; candidate SHA-256 `296a097cc153a2551cba3e38ddb9c60fba462c5e7a25055aa01d4c91202c72ba`, MVID `3f7e6564-3aac-4f67-ac54-6f8b82373506`, record `ev_02e2ea121659d23492e059b3b41bb52d5884d83315aebf7aec9a701f520104ff`.
+- The native end-to-end retest passed after manual sign-in to the candidate. Sessions search showed five rows. Selected only the original `rea_test` sessions starting `11:32:50` and `11:43:44` and clicked `Esporta in Csv`. Parsed the saved file and verified two detail rows, durations of 480 and 240 seconds, and the footer `2 Sessioni` / `00:12:00`. The actual Monitor export is ignored under `.local/evidence/monitor-rea_test-sessions-native-2026-11-25.csv`, SHA-256 `dd905333c9bfde5c02f0b2d654df29eeec37f8725be87e906289f197aec0090f`. The earlier SQL-derived fallback is a separate local file.
+
+## 25 November checkpoint — Sessions search passed in Monitor
+
+- Selected `rea_test` in `Sessioni` → `Utente` and ran `Cerca` for 25 November. Monitor reported `Invalid column name 'Line'`. The exact-build REA record `ev_1a5bb9feee2f07557d7e33118c607f7b1706649d68b5c82aaa006dfff5b08713` contains the Sessions projection from `Operations` at user-string token `0x70016050` for the Monitor SHA-256 and MVID recorded below.
+- Added a guarded `Operations.Line` column with an empty default in the local fixture. The SQL check inserts, searches and rolls back a synthetic session. Initialization and the existing checks passed.
+- Reran the same UI search. Monitor displayed two `MONITOR` sessions for `rea_test` totaling `00:12:00`, with no SQL error. The UI rows were existing test activity, separate from the rolled-back SQL check.
+
+## 25 November checkpoint — Sessions dropdown passed in Monitor
+
+- After `Users.Active` was added, the live Sessions tab exposed two more missing objects: `UserProfiles.ImageHighlighter` and `dbo.Lines`. Added an inferred `bit` flag defaulting to `0` and the minimal `Lines` table with one synthetic line in the test area. The test user qualifies through the existing DataValidation profile flag.
+- The SQL checks exercise the Sessions user lookup with the area joins, profile and membership validity, and DataValidation/ImageHighlighter predicate. The line lookup and existing batch checks also pass. The REA record for the exact Monitor build in the previous checkpoint covers the predicate and line queries at string tokens `0x7001104d`, `0x700111be` and `0x7001120c`.
+- In the signed-in Monitor UI, switched from Batches back to `Sessioni`. No SQL dialog appeared. Opening `Utente` displayed `rea_test (Synthetic fixture user)`. This verifies dropdown loading. Session search and exports were outside this test.
+
+## 25 November checkpoint — Sessions user lookup
+
+- Monitor's Sessions dropdown query filters `dbo.Users.Active = 1` and joins the selected profile through `UsersUsersProfilesMatch`. The exact-build REA record `ev_1a5bb9feee2f07557d7e33118c607f7b1706649d68b5c82aaa006dfff5b08713` contains the SQL literal at `0x7001066c` (Monitor SHA-256 `ac86a5241b0fdd4f13e4584f44d66a8693b40f2d684f5541baca9fb9c9c102d4`, MVID `3f7e6564-3aac-4f67-ac54-6f8b82373506`). Added a guarded `Active` bit column with a default of `1` for synthetic users and applied it to the running loopback fixture.
+- `Initialize-Fixture.ps1` and `Test-Local.ps1` passed. The Sessions lookup returned the configured test user, and the batch SQL checks still pass. Monitor showed a login prompt when the UI test was attempted. After manual sign-in, open `Sessioni` and confirm that `Utente` contains the test user without a SQL error.
+
+## 25 November checkpoint — Monitor batch list and ID filter passed
+
+- Monitor 3.4.9.73 showed 20 missing `Batches` columns when Search ran after the user signed in. Added those columns to the local synthetic fixture with guarded ALTER statements. Column types are fixture inferences. The SQL regression check now projects all 20 fields.
+- In the signed-in Monitor UI, unfiltered Search returned `Trovati 1` with grid ID `REA-BATCH-001` and name `REA Test Batch`. `Cerca Batch` → `ID Batch` → `REA-BATCH-001` returned that same row. `MISSING-REA-BATCH` returned `0 of 0` and `Nessun batch trovato`. Clearing the filter restored the row.
+- Acceptance covers Monitor listing and ID filtering. The separately observed Sessions tab user lookup reported a missing `active` column. Batch mutations, exports, and DataValidation document workflows remain unverified.
+
+## 25 November checkpoint — restored Monitor fixture
+
+- Started Docker Desktop, pulled the pinned SQL Server image, and initialized a fresh synthetic volume. The previous fixture volume and local credentials were absent. SQL Server listens on `127.0.0.1:14333`. The tracked permission manifest was reused with hash-verified executable builds.
+- Added the inferred Monitor list tables and seeded `REA-BATCH-001` in one active synthetic application. The process reference has no profile mapping, so it is unavailable from the manual process menu. The schema is scoped to listing and filtering. `Fields` and document workflows are still open.
+- `Initialize-Fixture.ps1` and `Test-Local.ps1` passed. They verified the synthetic credentials, active profile, settings/activity contracts, batch listing and positive/negative ID filters at the SQL layer. The isolated Monitor copy retained the recorded executable and Utility hashes. Its configuration check confirmed loopback SQL, disabled optional SQL connections, and a loopback web-service endpoint.
+- The isolated copy is `.local/runtime/fixture-baseline/Monitor.exe`. A launch was requested but no Monitor window was observed. Manual login with the generated credentials is required before UI acceptance. Once signed in, verify the list shows `REA-BATCH-001`, then apply a matching ID and a nonmatching ID and record the displayed results.
+
+## 25 November checkpoint — supplied Core scan and Monitor batch-list trace
+
+- Inventoried all 83 supplied top-level files. REA inspected 49 PE files: 45 assemblies had complete managed metadata coverage, and four native 32-bit GdPicture components had complete PE import-table coverage. The other 34 files were checked with local read-only tools for XML parsing, text readability, or binary headers. The scan did not execute any target or interpret file contents as instructions. Per-file hashes and scan references are under ignored `.local/evidence/core-supplied-scan-2026-11-25.json`.
+- The SHA-256 and MVID for Monitor, DataValidation and Utility match the existing evidence index. The supplied scripting engine is `1.0.6327.16398`, matching Monitor’s reference. DataValidation references `1.0.6327.16335`. This is a static version discrepancy with no runtime binding result.
+- Both `.4db` files and `Empty.mdb` have identical SHA-256 hashes and Jet headers. The Windows 32-bit Jet provider successfully enumerated tables on a local copy opened in read mode, including `BatchInfo`, `Data`, `History` and `Associate`. This established table presence only. No rows were inspected and no batch workflow was run.
+- Monitor’s batch-list trace below identifies additional fixture dependencies. At this checkpoint this checkout had no prepared test runtime or fixture credentials, the Docker client could not reach its engine, and TCP `127.0.0.1:14333` was unreachable. The next runtime check is Monitor login with a synthetic user followed by listing and filtering one synthetic batch. Record which query branches actually run before adding more tables or exercising writes. DataValidation workflow acceptance also requires a supported activation path and a valid synthetic user login.
+
+### Monitor batch-list fixture contract
+
+REA evidence `ev_1a5bb9feee2f07557d7e33118c607f7b1706649d68b5c82aaa006dfff5b08713` covers the selected `ForService.frmMainMonitor` type in Monitor SHA-256 `ac86a5241b0fdd4f13e4584f44d66a8693b40f2d684f5541baca9fb9c9c102d4`, MVID `3f7e6564-3aac-4f67-ac54-6f8b82373506`. The table lists dependencies observed in SQL literals loaded by the named methods. It does not establish the vendor schema or which branches execute with the fixture’s profile.
+
+| Method and token | Observed SQL dependency |
+|---|---|
+| `DBCaricaComboApplicazioni` (`0x06000419`) | Reads active `Applications`. Another branch joins `AreasApplicationsMatch`, `Areas`, `UserProfiles` and `Process`. |
+| `DBCaricaComboStati` (`0x06000417`) | Reads `Status` including `Name`, `MinPower`, `Color` and `IDApplication`. Application selection joins area/profile tables and `Process`. |
+| `CaricaProcessiEseguibili` (`0x06000418`) | Reads manual `Process` rows by profile via `UserProfilesProcessMatch`, with an application filter. |
+| `SearchingBatch` (`0x0600041c`) | Builds a query over `Batches` with application and batch ID filters. Also reads `IDBatch`, `RowVersion` and `IDApplication` together. |
+
+Use this contract to scope the first read-only fixture test. The existing schema supplies user/profile and activity tables. It does not yet provide the application, area, process, status and batch contracts above. The Jet template is separate from the synthetic SQL Server master database.
+
+## Current verified state
+
+The latest local audit supersedes the earlier startup-only notes below. After the user manually submitted both logins, direct accessibility inspection observed Monitor's main Batches window with Logout available and DataValidation's Apri Batch selector. No SQL errors were captured during those login attempts. Sanitized accessibility evidence is retained in ignored `.local/evidence/post-login-ui.json`. A Monitor refresh input failed in the computer-use helper (missing cached bounds/state), so refresh UI acceptance is not claimed.
+
+The fixture now contains 20 inferred tables covering startup, profile/application/process/status lists, the configured Monitor projection, empty field/event definitions, and activity logging. There are **zero configured applications, batches, or fields**. These empty definition tables do not establish document readiness and are not the vendor's complete schema.
+
+`scripts/Test-Readiness.ps1` passes database/profile/activity checks, 18 workspace SQL contracts using populated temporary rows rolled back afterward, actual compiled TableConfig/TableParameters reads, and a read-only 32-bit Jet template/schema check. Original/candidate VerifyKey tests passed all six cases and verify_checkpoint.py verified all 716 inputs unchanged. Initialization was repeated successfully. The launcher now checks workspace contracts before opening the apps. Test reports remain ignored under `.local/evidence`.
+
+`scripts/Watch-LocalErrors.ps1` provides project-only SQL error capture without SQL text (legacy login queries contain passwords). A deliberate marked missing-object probe verified the capture works; that known probe is excluded from application-error reports. The project capture was restarted with one-second dispatch latency after testing, and is left running. It does not capture UI-only exceptions. A failed attempt to change dispatch latency on a running session was corrected by setting it before start; this was a diagnostic-script failure, not an application failure.
+
+**Next task:** build one coherent synthetic job, process, field definition, Jet data file, image, and batch; then verify open, invalid/valid field entry, save, close/reopen, and Monitor listing/state persistence. The empty Fields/Events contracts need extending from actual row accesses before populating them. The supplied script-engine reference-version difference and third-party imaging behavior remain unaccepted. Do not describe this checkpoint as complete feature equivalence or complete document testing. Both existing test processes remain logged in; DataValidation is at its empty batch selector. The personal testing guide remains local and ignored.
+
+## Earlier investigation checkpoints
 
 The first session cloned the initially empty `Jani-konicoti/optimocore` repo into a separate sibling directory. It did not change the Dental Center Albania website.
 

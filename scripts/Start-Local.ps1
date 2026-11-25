@@ -2,6 +2,7 @@ param([ValidateSet('Both', 'Monitor', 'DataValidation', 'OriginalDataValidation'
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
 & (Join-Path $PSScriptRoot 'Test-Local.ps1')
+& (Join-Path $PSScriptRoot 'Test-Workspace.ps1')
 $index = Get-Content -LiteralPath (Join-Path $root 'docs/evidence-index.json') -Raw | ConvertFrom-Json
 $patch = Get-Content -LiteralPath (Join-Path $root '.local/candidates/license-probe/patch-report.json') -Raw | ConvertFrom-Json
 $names = switch ($Application) {

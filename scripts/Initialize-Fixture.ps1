@@ -11,9 +11,11 @@ $builder['Encrypt'] = $false
 $connection = New-Object System.Data.SqlClient.SqlConnection $builder.ConnectionString
 $connection.Open()
 try {
-    $sql = Get-Content -LiteralPath (Join-Path $root 'fixture/schema.sql') -Raw
+    foreach ($schemaFile in @('fixture/schema.sql', 'fixture/workspace.sql')) {
+    $sql = Get-Content -LiteralPath (Join-Path $root $schemaFile) -Raw
     foreach ($batch in ($sql -split '(?im)^GO\s*$')) {
         if ($batch.Trim()) { $command = $connection.CreateCommand(); $command.CommandText = $batch; $command.CommandTimeout = 60; $null = $command.ExecuteNonQuery(); $command.Dispose() }
+    }
     }
     $manifest = Get-Content -LiteralPath (Join-Path $root 'fixture/permissions.json') -Raw | ConvertFrom-Json
     foreach ($name in $manifest.permissions) {
