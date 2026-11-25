@@ -176,6 +176,49 @@ CREATE TABLE dbo.Batches (
     RowVersion rowversion NOT NULL
 );
 GO
+-- Monitor's default batch projection reads these even for an ID-only search.
+-- Infer display types for the synthetic fixture and upgrade existing volumes in place.
+IF COL_LENGTH(N'dbo.Batches', N'Box') IS NULL
+    ALTER TABLE dbo.Batches ADD Box nvarchar(128) NOT NULL DEFAULT N'';
+IF COL_LENGTH(N'dbo.Batches', N'Supporto') IS NULL
+    ALTER TABLE dbo.Batches ADD Supporto nvarchar(128) NOT NULL DEFAULT N'';
+IF COL_LENGTH(N'dbo.Batches', N'Dimensione') IS NULL
+    ALTER TABLE dbo.Batches ADD Dimensione nvarchar(128) NOT NULL DEFAULT N'';
+IF COL_LENGTH(N'dbo.Batches', N'Tipologia1') IS NULL
+    ALTER TABLE dbo.Batches ADD Tipologia1 nvarchar(128) NOT NULL DEFAULT N'';
+IF COL_LENGTH(N'dbo.Batches', N'Tipologia2') IS NULL
+    ALTER TABLE dbo.Batches ADD Tipologia2 nvarchar(128) NOT NULL DEFAULT N'';
+IF COL_LENGTH(N'dbo.Batches', N'Tipologia3') IS NULL
+    ALTER TABLE dbo.Batches ADD Tipologia3 nvarchar(128) NOT NULL DEFAULT N'';
+IF COL_LENGTH(N'dbo.Batches', N'Tipologia4') IS NULL
+    ALTER TABLE dbo.Batches ADD Tipologia4 nvarchar(128) NOT NULL DEFAULT N'';
+IF COL_LENGTH(N'dbo.Batches', N'Tipologia5') IS NULL
+    ALTER TABLE dbo.Batches ADD Tipologia5 nvarchar(128) NOT NULL DEFAULT N'';
+IF COL_LENGTH(N'dbo.Batches', N'Tipologia6') IS NULL
+    ALTER TABLE dbo.Batches ADD Tipologia6 nvarchar(128) NOT NULL DEFAULT N'';
+IF COL_LENGTH(N'dbo.Batches', N'NDocExp') IS NULL
+    ALTER TABLE dbo.Batches ADD NDocExp int NOT NULL DEFAULT 0;
+IF COL_LENGTH(N'dbo.Batches', N'NPagExp') IS NULL
+    ALTER TABLE dbo.Batches ADD NPagExp int NOT NULL DEFAULT 0;
+IF COL_LENGTH(N'dbo.Batches', N'NImgExp') IS NULL
+    ALTER TABLE dbo.Batches ADD NImgExp int NOT NULL DEFAULT 0;
+IF COL_LENGTH(N'dbo.Batches', N'ModDate') IS NULL
+    ALTER TABLE dbo.Batches ADD ModDate datetime NULL;
+IF COL_LENGTH(N'dbo.Batches', N'ModUser') IS NULL
+    ALTER TABLE dbo.Batches ADD ModUser nvarchar(128) NOT NULL DEFAULT N'';
+IF COL_LENGTH(N'dbo.Batches', N'ModStation') IS NULL
+    ALTER TABLE dbo.Batches ADD ModStation nvarchar(128) NOT NULL DEFAULT N'';
+IF COL_LENGTH(N'dbo.Batches', N'ExportDate') IS NULL
+    ALTER TABLE dbo.Batches ADD ExportDate datetime NULL;
+IF COL_LENGTH(N'dbo.Batches', N'ExportUser') IS NULL
+    ALTER TABLE dbo.Batches ADD ExportUser nvarchar(128) NOT NULL DEFAULT N'';
+IF COL_LENGTH(N'dbo.Batches', N'ExportStation') IS NULL
+    ALTER TABLE dbo.Batches ADD ExportStation nvarchar(128) NOT NULL DEFAULT N'';
+IF COL_LENGTH(N'dbo.Batches', N'Inviato') IS NULL
+    ALTER TABLE dbo.Batches ADD Inviato nvarchar(128) NOT NULL DEFAULT N'';
+IF COL_LENGTH(N'dbo.Batches', N'Convertito') IS NULL
+    ALTER TABLE dbo.Batches ADD Convertito nvarchar(128) NOT NULL DEFAULT N'';
+GO
 IF NOT EXISTS (SELECT 1 FROM dbo.Areas WHERE IDArea=1)
     INSERT dbo.Areas(IDArea) VALUES (1);
 IF NOT EXISTS (SELECT 1 FROM dbo.Applications WHERE IDApplication=1)

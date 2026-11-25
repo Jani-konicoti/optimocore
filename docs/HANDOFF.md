@@ -1,5 +1,11 @@
 # Team handoff — 24 November 2026
 
+## 25 November checkpoint — Monitor batch list and ID filter passed
+
+- Monitor 3.4.9.73 showed 20 missing `Batches` columns when Search ran after the user signed in. Added those columns to the local synthetic fixture with guarded ALTER statements. Column types are fixture inferences. The SQL regression check now projects all 20 fields.
+- In the signed-in Monitor UI, unfiltered Search returned `Trovati 1` with grid ID `REA-BATCH-001` and name `REA Test Batch`. `Cerca Batch` → `ID Batch` → `REA-BATCH-001` returned that same row. `MISSING-REA-BATCH` returned `0 of 0` and `Nessun batch trovato`. Clearing the filter restored the row.
+- Acceptance covers Monitor listing and ID filtering. The separately observed Sessions tab user lookup reported a missing `active` column. Batch mutations, exports, and DataValidation document workflows remain unverified.
+
 ## 25 November checkpoint — restored Monitor fixture
 
 - Started Docker Desktop, pulled the pinned SQL Server image, and initialized a fresh synthetic volume. The previous fixture volume and local credentials were absent. SQL Server listens on `127.0.0.1:14333`. The tracked permission manifest was reused with hash-verified executable builds.

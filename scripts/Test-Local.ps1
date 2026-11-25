@@ -64,7 +64,11 @@ VALUES(0,'',0,0,0,N'',N'',N'',N'Fixture contract check',N'',N'',N'',N'',GETDATE(
     if ('Batches' -in $tables -and 'Applications' -in $tables) {
         $command = $connection.CreateCommand()
         $command.CommandText = @'
-SELECT IDBatch, RowVersion, IDApplication FROM dbo.Batches WITH (NOLOCK)
+SELECT IDBatch, RowVersion, IDApplication, Box, Supporto, Dimensione,
+       Tipologia1, Tipologia2, Tipologia3, Tipologia4, Tipologia5, Tipologia6,
+       NDocExp, NPagExp, NImgExp, ModDate, ModUser, ModStation,
+       ExportDate, ExportUser, ExportStation, Inviato, Convertito
+FROM dbo.Batches WITH (NOLOCK)
 WHERE IDApplication IN (SELECT IDApplication FROM dbo.Applications WHERE Active=1)
 AND Status NOT IN (N'NASCOSTO',N'NASCOSTO WEB',N'NASCOSTO (S)')
 AND IDBatch LIKE @filter;
