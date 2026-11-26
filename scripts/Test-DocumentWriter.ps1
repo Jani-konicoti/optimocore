@@ -1,10 +1,10 @@
-param([switch]$TwoDocument)
+param([switch]$TwoDocument,[string]$RuntimeDirectory)
 $ErrorActionPreference='Stop'
 if([Environment]::Is64BitProcess) {throw 'Run with 32-bit Windows PowerShell (SysWOW64).'}
 Add-Type -AssemblyName System.Windows.Forms
 . (Join-Path $PSScriptRoot 'FixtureConnection.ps1')
 $root=Split-Path -Parent $PSScriptRoot
-$runtime=if($TwoDocument) {Join-Path $root '.local/runtime/fixture-baseline'} else {Join-Path $root '.local/runtime/document-test'}
+$runtime=if($RuntimeDirectory) {(Resolve-Path -LiteralPath $RuntimeDirectory).Path} elseif($TwoDocument) {Join-Path $root '.local/runtime/fixture-baseline'} else {Join-Path $root '.local/runtime/document-test'}
 $manifest=Get-Content -LiteralPath (Join-Path $root 'fixture/document-fields.json') -Raw | ConvertFrom-Json
 if((Get-FileHash -LiteralPath (Join-Path $runtime 'DataValidation.exe')).Hash.ToLowerInvariant() -ne $manifest.source_sha256) {throw 'Unexpected DataValidation build'}
 $fixture=Get-Content -LiteralPath (Join-Path $root '.local/fixture/document-fixture.json') -Raw | ConvertFrom-Json
