@@ -6,6 +6,7 @@
 - `Test-DocumentSqlTransitions.ps1` copied the synthetic batch row and documents to a new ID and disposable path in the marked loopback fixture. Original compiled methods acquired batch `26158212` (IN_VALIDATION, locked), paused it (PAUSED, unlocked), acquired it again (IN_VALIDATION, locked), then completed it (DONE, unlocked). Independent SQL confirmed DONE with two documents and two records. Source batch `1001` remained READY and unlocked.
 - The first run acquired scratch batch `83199738` and stopped before PAUSED because the undisplayed form lacked its system-parameter object. The corrected harness initializes that object. The failed row was later removed from the isolated fixture at the user's request. Its disposable files were archived under ignored `.local/evidence/retired-document-sql-83199738`. Row versions, statuses, and locks for `1001` and `26158212` were verified unchanged in the cleanup transaction.
 - After manual sign-in, Monitor Ricerca returned four rows. The row named `REA 1001 SQL Copy 26158212` showed ID `26158212` and status DONE in the same grid row. Native DataValidation navigation and application orchestration remain outside this method test.
+- Final Monitor check after scratch cleanup: refreshed the isolated Batches grid with Ricerca. It returned three rows. Scratch batch `83199738` was absent, source batch `1001` showed READY, and verified copy `26158212` showed DONE.
 
 ## 26 November compiled image lookup and interrupt/resume file handling passed
 
