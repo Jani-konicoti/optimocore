@@ -5,7 +5,7 @@
 - REA record `ev_7433488d5cd165e1b1c75f5fb2af378ccbb552da68dafd02425006eeb6e8a640` identifies `CercaBatchDaLavorare` (`0x060002e0`) and `CambiaStatoBatch` (`0x060002df`) for the indexed DataValidation SHA-256 and MVID below. The probe invoked them in 32-bit Windows PowerShell with the original executable and Utility.dll.
 - `Test-DocumentSqlTransitions.ps1` copied the synthetic batch row and documents to a new ID and disposable path in the marked loopback fixture. Original compiled methods acquired batch `26158212` (IN_VALIDATION, locked), paused it (PAUSED, unlocked), acquired it again (IN_VALIDATION, locked), then completed it (DONE, unlocked). Independent SQL confirmed DONE with two documents and two records. Source batch `1001` remained READY and unlocked.
 - The first run acquired separate scratch batch `83199738` and stopped before PAUSED because the undisplayed form lacked its system-parameter object. The corrected harness initializes that object. The first scratch row remains locked in the isolated fixture.
-- Monitor returned to Login before the grid check. Native DataValidation navigation and application orchestration remain outside this method test.
+- After manual sign-in, Monitor Ricerca returned four rows. The row named `REA 1001 SQL Copy 26158212` showed ID `26158212` and status DONE in the same grid row. Native DataValidation navigation and application orchestration remain outside this method test.
 
 ## 26 November compiled image lookup and interrupt/resume file handling passed
 
