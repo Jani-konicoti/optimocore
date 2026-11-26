@@ -6,6 +6,7 @@
 - Added `-TwoDocument` to `Test-DocumentWriter.ps1` for 32-bit Windows PowerShell. It checks each invalid and valid value using the compiled validator, invokes the writer only for the valid value, and verifies both record IDs and persisted values after reopening the disposable Jet copy. It also checks the source Jet hash.
 - On this host, `Assembly.LoadFrom` stopped with `0x80131515` before either method ran. The original baseline executables and DLLs carry the internet-download marker. The independent two-document preflight still passed for batch `1001` READY and unlocked.
 - Seeded separate display-only batch `1002` in the marked loopback `CoreReaDvFixture`, under the same synthetic job and assignment as `1001`. SQL returned `1002` with status DONE and name `REA Monitor DONE Display Probe`. Monitor showed its Login dialog. The grid check requires manual sign-in.
+- After the user signed in manually, Monitor's Ricerca returned two rows. The grid showed `REA Monitor DONE Display Probe` with status DONE, and the accessibility record identified the same row as batch `1002`. Batch `1001` was displayed as READY. This completes the independent Monitor display check.
 
 ## 26 November native test attempt — startup gate pending
 
