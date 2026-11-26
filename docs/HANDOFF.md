@@ -5,6 +5,7 @@
 - REA 6.10.1 record `ev_155c0f55a838740a0384eedfc4a84889affb4dbbce22fc889e0231764147295b` confirmed DataValidation SHA-256 `bd73afb20d1fe70a393d52774628fcaab8bef8ec22ecd96760bf2c05dbca11c0` and MVID `d74808a9-03f2-4e3f-b101-c198aff91fa6` in `.local/runtime/document-test-original`. Its Utility.dll also matched the original indexed hash. The runner used the validator and writer tokens from the selected-type REA record below.
 - `Test-DocumentWriter.ps1 -TwoDocument -RuntimeDirectory .local/runtime/document-test-original` passed in 32-bit Windows PowerShell. Document 1 rejected `ABCD` and persisted `1234`. Document 2 rejected `WXYZ` and persisted `5678`. Both accepted values had status `0` after a fresh Jet connection opened the disposable copy.
 - The source Jet SHA-256 matched before and after the test. The independent fixture check still found batch `1001` READY and unlocked with two records. The compiled-method test did not exercise native navigation, pause, resume, or batch completion.
+- The subsequent native launch used the same verified executable against the loopback document fixture. Windows accessibility identified `frmLicenseDialog` (4Service Attivazione) in front of the disabled Login dialog. The batch picker remained inaccessible. The two-document preflight passed immediately before launch. Native acceptance requires valid activation for this test setup and manual sign-in.
 
 ## 26 November two-document method and Monitor display checks
 
