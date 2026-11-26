@@ -47,10 +47,10 @@ The supplied screenshot's stack identifies `SqlDataAdapter.Fill` -> `frmMainDV.S
 
 | Workflow | Code anchors | Current evidence |
 |---|---|---|
-| Choose/open a batch | `frmScegliBatch`, `ApriBatch` (`0x060002d6`), `ApriDBBatch` (`0x060002d0`) | Managed code and Jet/OleDb Data-table access; not executed |
-| Validate a field | `ConfermaCampo` (`0x060002a9`), `ForService.Verifiche.*`, scripting-engine calls | Built-in checks, script hooks, and field-handling code present |
-| Image navigation/editing | `GoToNextImage`, `GoToNextPage`, `frmThumbsForm`, `frmImageBrowser`, `SalvaImmagineCorrente` | Forms/resources plus GdPicture calls; not executed |
-| Finish a batch | `ChiudiBatch` (`0x060002d8`), `CopiaFiledatiSuServerEChiudiBatch`, `CambiaStatoBatch` (`0x060002df`) | Local/server-copy and Batches-update paths; no writes exercised |
+| Choose/open a batch | `frmScegliBatch`, `ApriBatch` (`0x060002d6`), `ApriDBBatch` (`0x060002d0`) | One synthetic batch opened and reopened natively; two-document resume remains pending |
+| Validate a field | `ConfermaCampo` (`0x060002a9`), `ForService.Verifiche.*`, scripting-engine calls | One script-free field rejected `ABCD`, accepted `1234`, and persisted; script paths remain unverified |
+| Record/image navigation | Previous/next handlers (`0x0600030f`, `0x06000310`), `GoToPreviousImage` (`0x0600035a`), `GoToNextImage` (`0x0600035b`) | Exact-build REA call/field paths plus a prepared two-document fixture; native navigation not yet exercised |
+| Interrupt/finish a batch | Pause handler (`0x060002e7`), `ChiudiBatch` (`0x060002d8`), `CopiaFiledatiSuServerEChiudiBatch` (`0x060002b9`) | One native DONE save/close passed. REA ties Pause to `StatusEndInt`/PAUSED; native interrupt/resume is pending |
 | Repository integration | `Alfresco.AlfrescoWebService` and generated SOAP types | Client code/config only; endpoint not contacted |
 
-The initial disposable master fixture has now been constructed and the original/candidate startup comparison passed. Next extend its inferred schema and seed data for profiles, applications, process definitions and a batch, then log in with the test user and validate one synthetic document. The packaged Jet templates alone do not supply the complete master database.
+The single-document native round trip has passed. An opt-in two-document fixture is now prepared for navigation and interrupt/resume acceptance; see the newest handoff. The packaged Jet templates alone do not supply the complete vendor database.

@@ -1,4 +1,27 @@
-# Team handoff — 25 November 2026
+# Team handoff — 26 November 2026
+
+## 26 November checkpoint — REA-backed two-document fixture prepared
+
+Continues `2757089`. The previously accepted single-document round trip remains the regression baseline. This checkpoint prepares, but does not yet claim, the next native acceptance slice: two documents, previous/next navigation, `File > Interrompi`, resume, and final completion.
+
+- Hash-checked the surviving unchanged DataValidation executable as SHA-256 `bd73afb20d1fe70a393d52774628fcaab8bef8ec22ecd96760bf2c05dbca11c0`. REA 6.10.1 inspected exact type `ForService.frmMainDV` with complete selected-type coverage (554 methods, 16,665 call edges, 4,138 field accesses, 1,437 loaded string literals), MVID `d74808a9-03f2-4e3f-b101-c198aff91fa6`, complete record `ev_7433488d5cd165e1b1c75f5fb2af378ccbb552da68dafd02425006eeb6e8a640`. Raw Evidence remains ignored under `.local/evidence`.
+- Static CIL shows `PauseToolStripMenuItem_Click` (`0x060002e7`) calling `CopiaFiledatiSuServerEChiudiBatch(bool,string)` (`0x060002b9`) with `false` and field `StatusEndInt`. The fixture maps `StatusEndInt` to `PAUSED`. This is static behavior evidence; it is not a runtime observation of interruption.
+- REA also identifies record navigation handlers `ToolStripMenuItemPrevious_Click` (`0x0600030f`) and `ToolStripMenuItemNext_Click` (`0x06000310`). Both read/write `RecordCorrente`, load the record, update position, and restore field highlighting. Image navigation remains separate in `GoToPreviousImage` (`0x0600035a`) and `GoToNextImage` (`0x0600035b`).
+- Added opt-in `-TwoDocument` preparation. It retains document 1 and adds document 2 (`RecNum=2`, `IDDoc=2`) with a synthetic TIFF showing `5678` and deliberately invalid pending value `WXYZ` / Status `1`. Batch counts become two documents, records, and images. The default preparation path remains compatible with the one-document case and never resets existing values.
+- Extended `Test-DocumentFixture.ps1` with `-ExpectTwoDocument`, `-ExpectInterrupted`, and `-ExpectComplete`. These independently check SQL counts/state/locks and both server-side Jet records. They do not claim UI navigation or save behavior by themselves.
+- Applied the two-document preparation twice to the isolated local fixture to verify idempotence. `Test-DocumentFixture.ps1 -ExpectTwoDocument` passed with batch `1001` READY/unlocked and two Jet rows; `-ExpectInterrupted` correctly rejected that unexercised READY state. The main `Test-Local.ps1` regression, PowerShell parsing, and `git diff --check` passed.
+
+Native interruption/resume is still pending. This checkout did not retain the ignored patched document runtime or original private input, so the application was not launched. The local SQL container initially held an older incomplete master; `Initialize-Fixture.ps1` repaired it. The failed, newly created and correctly marked document fork was then dropped and recreated from the repaired synthetic master; no original or production database was touched.
+
+When the private input and isolated activation candidate are restored, continue with:
+
+```powershell
+powershell -NoProfile -File scripts/Prepare-DocumentFixture.ps1 -TwoDocument
+& "$env:WINDIR\SysWOW64\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -File scripts/Prepare-DocumentData.ps1 -TwoDocument
+& "$env:WINDIR\SysWOW64\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -File scripts/Test-DocumentFixture.ps1 -ExpectTwoDocument
+```
+
+Then sign in to the isolated document runtime, save document 1 as `1234`, navigate to document 2, interrupt before correcting it, and run `-ExpectInterrupted`. Resume the same PAUSED batch, confirm navigation and persisted document 1, save document 2 as `5678`, finish, and run `-ExpectComplete`. Verify the final DONE/unlocked state in Monitor. Keep any script-field test separate because the scripting-engine identity mismatch remains unresolved.
 
 ## 25 November checkpoint — native DataValidation document round trip passed
 

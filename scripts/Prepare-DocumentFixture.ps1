@@ -1,3 +1,4 @@
+param([switch]$TwoDocument)
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot 'FixtureConnection.ps1')
 $root=Split-Path -Parent $PSScriptRoot
@@ -99,6 +100,20 @@ SELECT IDField FROM dbo.Fields WHERE IDApplication=2 AND Name=N'REFERENCE';
     $null=$command.Parameters.AddWithValue('@user',[string]$credentials.app_user)
     $fieldId=[int]$command.ExecuteScalar()
     $command.Dispose()
+    if($TwoDocument) {
+        $command=$connection.CreateCommand()
+        $command.CommandText=@'
+UPDATE dbo.Applications
+ SET Description=N'Two synthetic validation documents'
+ WHERE IDApplication=2;
+UPDATE dbo.Batches
+ SET NDoc=2,NPag=2,NImg=2,Note=N'Two synthetic four-digit reference documents'
+ WHERE IDBatch=N'1001';
+'@
+        $null=$command.ExecuteNonQuery()
+        $command.Dispose()
+    }
     @{database='CoreReaDvFixture'; batch='1001'; application_id=2; field_id=$fieldId; directory=$directory; scope='Synthetic document fixture fork, separate from the Monitor acceptance database'} | ConvertTo-Json | Set-Content -Encoding UTF8 (Join-Path $root '.local/fixture/document-fixture.json')
-    Write-Output 'Prepared numeric batch 1001, its process and a required four-digit reference field. Existing document values were not reset.'
+    $documentLabel=if($TwoDocument) {'two-document'} else {'single-document'}
+    Write-Output "Prepared numeric batch 1001, its process and a required four-digit reference field ($documentLabel mode). Existing document values were not reset."
 } finally {$connection.Dispose()}
