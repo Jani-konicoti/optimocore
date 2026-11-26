@@ -1,5 +1,11 @@
 # Team handoff — 26 November 2026
 
+## 26 November native test attempt — startup gate pending
+
+- REA 6.10.1 reconfirmed the original DataValidation SHA-256 and MVID listed below in artifact record `ev_1b475c0b0a52f9b05a1fad674eb009abab49b9afd02e1dca798e949e11ac2094`. Reused the selected-type record below for the navigation and interruption handlers.
+- Started the hash-matched original applications from `.local/runtime/document-test-original`. Both configurations point to the loopback `CoreReaDvFixture`. Monitor displayed Login. DataValidation displayed a disabled main window at startup. Windows accessibility did not identify its blocking dialog. This checkout has no confirmed valid test activation.
+- The independent SQL and Jet preflight found batch `1001` READY and unlocked with two records. The PAUSED and DONE checks both rejected that state as expected. No workflow actions were submitted. Navigation, interruption, resume, and Monitor DONE verification remain pending. Continue after valid DataValidation activation and manual sign-in to both isolated applications.
+
 ## 26 November checkpoint — REA-backed two-document fixture prepared
 
 Continues `2757089`. The previously accepted single-document round trip remains the regression baseline. This checkpoint prepares, but does not yet claim, the next native acceptance slice: two documents, previous/next navigation, `File > Interrompi`, resume, and final completion.
