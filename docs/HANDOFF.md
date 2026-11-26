@@ -1,5 +1,10 @@
 # Team handoff — 26 November 2026
 
+## 26 November supplied installation matches the isolated runtime
+
+- REA 6.10.1 inspected the user-supplied installation and confirmed DataValidation 3.4.9.76, SHA-256 `bd73afb20d1fe70a393d52774628fcaab8bef8ec22ecd96760bf2c05dbca11c0`, and MVID `d74808a9-03f2-4e3f-b101-c198aff91fa6` in record `ev_f548df1bce09bfebe7d1114fb266886c0a7818143fbdc9d103b4051c4851cf9c`. DataValidation.exe, Utility.dll, and Monitor.exe match the existing isolated runtime byte for byte.
+- Reused the isolated runtime. Its DataValidation window still showed 4Service Attivazione in front of the disabled Login dialog. The independent fixture check passed with batch `1001` READY, unlocked, and containing two records. Native navigation, interruption, resume, and final DONE remain pending valid activation for the isolated test setup.
+
 ## 26 November two-document validation and persistence passed
 
 - REA 6.10.1 record `ev_155c0f55a838740a0384eedfc4a84889affb4dbbce22fc889e0231764147295b` confirmed DataValidation SHA-256 `bd73afb20d1fe70a393d52774628fcaab8bef8ec22ecd96760bf2c05dbca11c0` and MVID `d74808a9-03f2-4e3f-b101-c198aff91fa6` in `.local/runtime/document-test-original`. Its Utility.dll also matched the original indexed hash. The runner used the validator and writer tokens from the selected-type REA record below.
