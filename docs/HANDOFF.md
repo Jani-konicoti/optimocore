@@ -1,5 +1,12 @@
 # Team handoff — 26 November 2026
 
+## 26 November compiled SQL transitions on a copy of batch 1001 passed
+
+- REA record `ev_7433488d5cd165e1b1c75f5fb2af378ccbb552da68dafd02425006eeb6e8a640` identifies `CercaBatchDaLavorare` (`0x060002e0`) and `CambiaStatoBatch` (`0x060002df`) for the indexed DataValidation SHA-256 and MVID below. The probe invoked them in 32-bit Windows PowerShell with the original executable and Utility.dll.
+- `Test-DocumentSqlTransitions.ps1` copied the synthetic batch row and documents to a new ID and disposable path in the marked loopback fixture. Original compiled methods acquired batch `26158212` (IN_VALIDATION, locked), paused it (PAUSED, unlocked), acquired it again (IN_VALIDATION, locked), then completed it (DONE, unlocked). Independent SQL confirmed DONE with two documents and two records. Source batch `1001` remained READY and unlocked.
+- The first run acquired separate scratch batch `83199738` and stopped before PAUSED because the undisplayed form lacked its system-parameter object. The corrected harness initializes that object. The first scratch row remains locked in the isolated fixture.
+- Monitor returned to Login before the grid check. Native DataValidation navigation and application orchestration remain outside this method test.
+
 ## 26 November compiled image lookup and interrupt/resume file handling passed
 
 - REA selected-type record `ev_7433488d5cd165e1b1c75f5fb2af378ccbb552da68dafd02425006eeb6e8a640` binds the method tokens to DataValidation SHA-256 `bd73afb20d1fe70a393d52774628fcaab8bef8ec22ecd96760bf2c05dbca11c0` and MVID `d74808a9-03f2-4e3f-b101-c198aff91fa6`. The probe checks these identities and the original Utility.dll hash.
