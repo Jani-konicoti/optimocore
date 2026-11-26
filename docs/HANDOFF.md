@@ -1,5 +1,12 @@
 # Team handoff — 26 November 2026
 
+## 26 November two-document method and Monitor display checks
+
+- Checked the hash of the original DataValidation executable and confirmed the validator `VerificaValoreCampoPreScriptNet` (`0x06000281`) and writer `ScriviCampoSuDb` (`0x060002dc`) in REA record `ev_7433488d5cd165e1b1c75f5fb2af378ccbb552da68dafd02425006eeb6e8a640`. Its SHA-256 and MVID are listed below.
+- Added `-TwoDocument` to `Test-DocumentWriter.ps1` for 32-bit Windows PowerShell. It checks each invalid and valid value using the compiled validator, invokes the writer only for the valid value, and verifies both record IDs and persisted values after reopening the disposable Jet copy. It also checks the source Jet hash.
+- On this host, `Assembly.LoadFrom` stopped with `0x80131515` before either method ran. The original baseline executables and DLLs carry the internet-download marker. The independent two-document preflight still passed for batch `1001` READY and unlocked.
+- Seeded separate display-only batch `1002` in the marked loopback `CoreReaDvFixture`, under the same synthetic job and assignment as `1001`. SQL returned `1002` with status DONE and name `REA Monitor DONE Display Probe`. Monitor showed its Login dialog. The grid check requires manual sign-in.
+
 ## 26 November native test attempt — startup gate pending
 
 - REA 6.10.1 reconfirmed the original DataValidation SHA-256 and MVID listed below in artifact record `ev_1b475c0b0a52f9b05a1fad674eb009abab49b9afd02e1dca798e949e11ac2094`. Reused the selected-type record below for the navigation and interruption handlers.
