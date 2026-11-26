@@ -1,5 +1,11 @@
 # Team handoff — 26 November 2026
 
+## 26 November compiled image lookup and interrupt/resume file handling passed
+
+- REA selected-type record `ev_7433488d5cd165e1b1c75f5fb2af378ccbb552da68dafd02425006eeb6e8a640` binds the method tokens to DataValidation SHA-256 `bd73afb20d1fe70a393d52774628fcaab8bef8ec22ecd96760bf2c05dbca11c0` and MVID `d74808a9-03f2-4e3f-b101-c198aff91fa6`. The probe checks these identities and the original Utility.dll hash.
+- In 32-bit Windows PowerShell, `scripts/Test-DocumentNavigation.ps1` executed the original compiled image list/index/record methods (`0x060002ca`, `0x060002cb`, `0x0600035c`) and the two copy helpers (`0x060002c5`, `0x060002c7`). The forward/backward image-to-record lookups returned 1, 2, 1 before and after copy-back and fresh copy-in. The reopened Jet copy held the seeded edit `1234`/0 and the pending second record `WXYZ`/1. Copy-back closed the working Jet connection. The original batch Jet hash matched before and after.
+- All writes went to disposable folders under ignored `.local/evidence`. The probe seeded one Jet edit directly to test transfer and did not invoke UI handlers, SQL pause/resume transitions, or Monitor. The independent fixture check still found batch `1001` READY, unlocked, and holding two records. Native navigation, PAUSED/resume, and DONE for `1001` remain pending.
+
 ## 26 November supplied installation matches the isolated runtime
 
 - REA 6.10.1 inspected the user-supplied installation and confirmed DataValidation 3.4.9.76, SHA-256 `bd73afb20d1fe70a393d52774628fcaab8bef8ec22ecd96760bf2c05dbca11c0`, and MVID `d74808a9-03f2-4e3f-b101-c198aff91fa6` in record `ev_f548df1bce09bfebe7d1114fb266886c0a7818143fbdc9d103b4051c4851cf9c`. DataValidation.exe, Utility.dll, and Monitor.exe match the existing isolated runtime byte for byte.
