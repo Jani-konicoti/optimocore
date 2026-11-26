@@ -1,5 +1,15 @@
 # Team handoff — 26 November 2026
 
+## 26 November local preparation after pulling 75fe8a5
+
+- Pulled `75fe8a5` and prepared the two-document fixture on this machine. Retained a copy-only checksum backup of CoreReaDvFixture and a local copy of the previous single-document files before preparation. The existing first value was preserved as `1234` / Status 0; document two was added as `WXYZ` / Status 1 with its synthetic `5678` image. Returned the unlocked synthetic batch `1001` from DONE to READY explicitly as test preparation, not as an application workflow result.
+- The two-document compiled validator/writer checks passed on a disposable copy using the original runtime. The compiled image/navigation and copy-back/reopen checks passed with the source Jet hash unchanged. Compiled SQL acquisition, pause, reacquisition and completion passed on a separate copy, batch `95664315`; source `1001` remained READY and unlocked.
+- `Test-Readiness.ps1 -IncludeDocument` passed, including all 18 workspace contracts. A fresh `Test-DocumentFixture.ps1 -ExpectTwoDocument` confirmed two records and READY/unlocked. DataValidation and Monitor started from the existing isolated document-test runtime and both process windows were responding. This runtime retains the previously recorded activation probe; it does not establish vendor-issued activation or native two-document acceptance.
+- The SQL error capture session was not running after Docker restarted. Started it, verified it with the marked missing-object probe, and read zero application errors after excluding that probe. Local reports remain ignored. The personal `docs/TESTING.md` remains ignored and was not staged.
+- `verify_checkpoint.py` completed: all 716 original input files are unchanged; the recorded isolated probe still changes only VerifyKey and its six retained method checks pass.
+
+Next: manual sign-in and the native two-document workflow described below. Because document one already contains the earlier accepted 1234, explicitly exercise invalid ABCD then correct it to 1234 before interruption; do not treat an unchanged displayed value as evidence of a new save. Native navigation, interrupt/resume persistence and final DONE for this two-document source batch are still pending. No code fixes were required for today's automated checks.
+
 ## 26 November compiled SQL transitions on a copy of batch 1001 passed
 
 - REA record `ev_7433488d5cd165e1b1c75f5fb2af378ccbb552da68dafd02425006eeb6e8a640` identifies `CercaBatchDaLavorare` (`0x060002e0`) and `CambiaStatoBatch` (`0x060002df`) for the indexed DataValidation SHA-256 and MVID below. The probe invoked them in 32-bit Windows PowerShell with the original executable and Utility.dll.
