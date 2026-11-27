@@ -48,9 +48,19 @@ The supplied screenshot's stack identifies `SqlDataAdapter.Fill` -> `frmMainDV.S
 | Workflow | Code anchors | Current evidence |
 |---|---|---|
 | Choose/open a batch | `frmScegliBatch`, `ApriBatch` (`0x060002d6`), `ApriDBBatch` (`0x060002d0`) | One synthetic batch opened and reopened natively; two-document resume remains pending |
-| Validate a field | `ConfermaCampo` (`0x060002a9`), `ForService.Verifiche.*`, scripting-engine calls | One script-free field rejected `ABCD`, accepted `1234`, and persisted; script paths remain unverified |
+| Validate a field | `ConfermaCampo` (`0x060002a9`), `VerificaValoreCampoCorrente` (`0x06000282`), `EseguiSQLsuDB` (`0x0600027f`) | Native script-free round trip passed. The compiled field verifier also confirmed the scoped `SCRIPTSQL … EXISTS` rejection rule on the scripted fixture |
 | Record/image navigation | Previous/next handlers (`0x0600030f`, `0x06000310`), `GoToPreviousImage` (`0x0600035a`), `GoToNextImage` (`0x0600035b`) | Exact-build REA call/field paths plus a prepared two-document fixture; native navigation not yet exercised |
 | Interrupt/finish a batch | Pause handler (`0x060002e7`), `ChiudiBatch` (`0x060002d8`), `CopiaFiledatiSuServerEChiudiBatch` (`0x060002b9`) | One native DONE save/close passed. REA ties Pause to `StatusEndInt`/PAUSED; native interrupt/resume is pending |
 | Repository integration | `Alfresco.AlfrescoWebService` and generated SOAP types | Client code/config only; endpoint not contacted |
 
 The single-document native round trip has passed. An opt-in two-document fixture is now prepared for navigation and interrupt/resume acceptance; see the newest handoff. The packaged Jet templates alone do not supply the complete vendor database.
+
+## Scripted field checks
+
+REA record `ev_2765eab74318a3bbd0367deaf7ddfd2f3047efb1a4e9fbe8f9f547444f2c469a` binds the field method tokens to the hash and MVID above. The full field verifier reads `PreProc`, `OnCheck`, and `PostProc`. It can call the built-in command interpreter, `ElaboraScript` (`0x06000287`), and the compiled assembly runner, `RunScriptNet` (`0x06000259`). The SQL branch recognizes `SCRIPTSQL`, invokes `EseguiSQLsuDB`, and checks the `EXISTS` suffix.
+
+For the tested `REFERENCE` configuration, the original compiled `SCRIPTSQL … EXISTS` path **rejects a matching row**. On an undisplayed form, `Test-LegacyScriptRule.ps1` demonstrated that the original executable rejected blocked `0000` and accepted `1234` and `5678`. The probe used read-only SQL and supplied its loopback connection in memory. The standalone adapter recognizes this fixed rule and binds the value as a SQL parameter. Both this rule and its data are synthetic.
+
+The same REA record shows both `PreProc` and `PostProc` calling `ElaboraScript` from `VerificaValoreCampoCorrente`. In the tested message hooks, `PreProc` ran before the field format and SQL lookup checks. Its operator message remained visible on rejection. `PostProc` ran on acceptance and replaced that message. The original uppercased the message and matched the tested `REFERENCE="ABCD"` condition case-insensitively. The replacement supports this bounded message grammar. A field-assignment probe on an undisplayed form stalled, so transformation and general interpreter parity remain unverified.
+
+`FourService.Script.dll` 1.4.0.3 has SHA-256 `39044f37b74457e2b571863de8e170f9a0437c36f6d1f8a6d2a586b0acbab92d`, MVID `2404d80b-17f8-4330-a4fc-3d5c9aad3c76`, and REA record `ev_c806fb194bf51eded083ce16558ad98b773c2bdbcf995c35ac00482bde4c11e4`. Its `InsertFieldsScripts` (`0x0600002a`) reads `PreProc` and `CompiledScript`, and `Compila` (`0x06000033`) compiles source. The supplied engine 1.0.6327.16398 is identified in `ev_23b5dc7b9992633fb3b24f02fe7cf9e61c702eb1a7149836a8ceafcd13725e82`. The executable references 1.0.6327.16335. The original compiled C#/VB script path has no runtime acceptance in this check.

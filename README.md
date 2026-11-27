@@ -12,6 +12,20 @@ The investigation recovered managed member inventories and local C# reconstructi
 
 Start with [the handoff](docs/HANDOFF.md), [the local fixture](docs/FIXTURE.md), [Monitor findings](docs/MONITOR.md), [DataValidation findings](docs/DATAVALIDATION.md), [dependencies](docs/DEPENDENCIES.md), and the [evidence index](docs/evidence-index.json).
 
+## Standalone DataValidation for Windows
+
+From the repository root, run `python -m datavalidation_app` with Python and Tkinter. Open batch 1001 and confirm each document's four-digit reference. The app saves confirmations, remembers where you left off when pausing, and enables completion after both documents are confirmed. Pillow and the two locally prepared fixture TIFFs enable scan previews. The app can also display built-in synthetic reference sheets on a clean checkout.
+
+The default mode uses its own SQLite database at `.local/standalone-validation/workspace.sqlite`. It runs independently of the proprietary executable. Run `python -m unittest datavalidation_app.test_store -v` to check the SQLite workflow.
+
+To use the legacy backend, start the marked SQL document fixture with the two-document batch prepared and install Pillow in the Python environment if needed for TIFF previews. Run `python -m datavalidation_app --legacy-fixture new` to clone batch 1001, or `python -m datavalidation_app --legacy-fixture BATCH_ID` to reopen one of these clones. The command prints the clone ID. It stores the working and published Jet files under ignored `.local/legacy-validation/BATCH_ID`. Confirmation writes the working copy. Pausing or completing publishes the copy and releases the SQL lock.
+
+The legacy backend uses Windows PowerShell with 32-bit Jet 4.0 and is restricted to app-created clones in the marked loopback fixture. It supports the two-document, single-reference fixture contract. Run `python -m datavalidation_app.test_legacy` to exercise the desktop workflow on a new disposable clone.
+
+Run `python -m datavalidation_app --legacy-fixture new-scripted` to try the scripted reference lookup. Its `Fields.OnCheck` rule uses the legacy `SCRIPTSQL … EXISTS` form. For this field, a matching row blocks confirmation. The fixture seeds `0000` as the blocked reference. The app uses a parameterized lookup on its established fixture connection. Run `python -m datavalidation_app.test_legacy --scripted` for an automated round trip. Other scripts, compiled C#/VB, vendor profiles, other batch schemas, and production connections are outside the supported scope.
+
+Run `python -m datavalidation_app --legacy-fixture new-hooks` to try `PreProc` and `PostProc` on the same lookup workflow. The adapter supports literal `SETMESSAGE` and the verified `IF(REFERENCE="ABCD";SETMESSAGE("…");SETMESSAGE("…"))` form. Enter `ABCD` to see the pre-check message with the format error, `0000` to see it with the blocking lookup error, or `1234` to see the post-check message and save successfully. Run `python -m datavalidation_app.test_legacy --hooks` for the automated round trip. Field assignment, general command execution, and compiled scripts remain unsupported.
+
 For the already-prepared local setup, `powershell -NoProfile -File scripts/Start-Local.ps1` checks the local fixture and opens both test programs.
 
 ## Reproduce on Windows
